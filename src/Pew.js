@@ -13,7 +13,7 @@ function Pew( theCanvasHeight, theX, theY )
     //  public variables.
     // 
 	that.image = new Image(); 
-	that.image.src = "pew.png";
+	that.image.src = "../media/pew.png";
 	that.width =    24;
 	that.height =   72;
 	that.X = theX;

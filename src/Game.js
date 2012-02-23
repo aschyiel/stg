@@ -2,8 +2,8 @@
 //
 //  globals.
 //
-var width = 320, 
-        height = 500,
+var width = 768, 
+        height = 448,
         gLoop,
         _canvas = document.getElementById('id_canvas'), 
         ctx = _canvas.getContext('2d');
@@ -26,8 +26,18 @@ var clear = function(){
 	ctx.fill();
 } 
 
+/* the global game state. */
+var gameState = "";
+
+/* the current stage in a level in the game. */
+var stage = 0;
+
+/* the current "level" in the game. */
+var level = 0;
+
 var gameFactory = new GameFactory();
-var player = gameFactory.getPlayer();
+var director = new Director();
+var player = director.getPlayer();  
 player.setPosition(~~((width-player.width)/2), ~~((height - player.height)/2)); 
 
 //
@@ -95,10 +105,33 @@ document.onkeyup = function( event )
 
 var GameLoop = function(){
 	clear(); 
-	player.draw( ctx );
-    gameFactory.draw( ctx );
-    // last!
-	gLoop = setTimeout(GameLoop, 1000 / 50);
+
+	if ( "PLAYING" == gameState )
+	{
+        director.direct(); 
+        director.draw( ctx );
+    }
+    else if ( "PAUSED" == gameState )
+    {
+        // TODO!
+    }
+
+	gLoop = setTimeout(GameLoop, 1000 / 50);    // last!
 }
 
-GameLoop();
+/*
+*   the main method in the Game.js
+*/
+var main = function()
+{
+    gameState = "PLAYING";
+    level = 1;
+    stage = 1;
+
+    director.setLevel( level );
+    director.setStage( stage );
+    director.setupLevelStage();
+    GameLoop();
+}
+
+main();

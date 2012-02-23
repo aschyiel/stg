@@ -2,7 +2,7 @@
 *   ..player.js, uly, dec2011..
 *
 */
-function Player( canvasWidth, canvasHeight, gameFactory )
+function Player( canvasWidth, canvasHeight, director )
 { 
 	var that = this;
 
@@ -10,10 +10,10 @@ function Player( canvasWidth, canvasHeight, gameFactory )
     //  public variables.
     // 
 	that.image = new Image(); 
-	that.image.src = "ship.png"
-	that.width = 65;
-	that.height = 95;
-	that.frames = 1;
+	that.image.src = "../media/player.png"
+	that.width = 32;
+	that.height = 32;
+	that.frames = 3;
 	that.actualFrame = 0;
 	that.X = 0;
 	that.Y = 0;	
@@ -23,7 +23,7 @@ function Player( canvasWidth, canvasHeight, gameFactory )
     //  private variables.
     //
     
-    var _gameFactory = gameFactory;
+    var _director = director;
     var _canvasWidth = canvasWidth;
     var _canvasHeight = canvasHeight;
 
@@ -154,10 +154,14 @@ function Player( canvasWidth, canvasHeight, gameFactory )
 		that.interval++;		
 	}
 
+    /*
+    *   add a projectile shot by the player into the game via the director.
+    */
     that.shoot = function()
     {
         var zX = that.X + ~~( that.width / 2 );
-        _gameFactory.newPew( _canvasHeight, zX, that.Y );
+        //_gameFactory.newPew( _canvasHeight, zX, that.Y );
+        _director.addPlayerProjectile( _canvasHeight, zX, that.Y );
     }
 
     //

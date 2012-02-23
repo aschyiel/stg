@@ -1,5 +1,8 @@
 /*
 *   ..GameFactory.js, uly, dec2011..
+*
+*   The GameFactory is a static singleton class that knows how to draw everything.
+*
 */
 function GameFactory()
 {
