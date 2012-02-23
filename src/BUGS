@@ -1,0 +1,4 @@
+Pew shoots "off-center" from player.
+Player animation jitters because it is "off-center", fix by perfectly aligning player image.
+Player shoot is delayed via delay.  needs to be on-demand, but still respect a delay.
+spaceBar "knocks" the webPage down.
