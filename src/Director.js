@@ -14,7 +14,6 @@ function Director()
     //  private variables.
     //
 
-    var _gameFactory = new GameFactory();
     var _gameGraph = new Array();
 
     /* the current level-stage the director is directing. */ 
@@ -49,14 +48,14 @@ function Director()
         //
         //  introduce level elements based on our level progress.
         //
-        var newActors = _levelGuide.( _levelProgress );
+        var newActors = _levelGuide[ _levelProgress ];
         if ( newActors )
         {
             newActors.forEach( function( actorType ) 
             {  
                 if ( ENEMY == actorType )
                 {
-                    _gameGraph.push( _gameFactory.newEnemy() ); // TODO:change position
+                    _gameGraph.push( g.gameFactory.newEnemy() ); // TODO:change position
                 }
             }); 
         }
@@ -68,15 +67,29 @@ function Director()
         _gameGraph.forEach( function( gameObject )
         {
             gameObject.tick();
-        }):
+        });
 
         //
-        //  TODO:collisions/damage
+        //  collisions/damage
+        //  loop through all projectiles, and see if they hit anything.
         //
+
+        var destructables = filterAsDestructables( _gameGraph ); 
+        for ( var i = 0, length = _projectiles.length; i < length; i++ )
+        {
+            var projectile = _projectiles[ i ]; 
+            destructables.forEach( function( destructable )
+            {
+                if ( projectile.isTouching( destructable ) )
+                        projectile.dealDamage( destructable );
+
+            });
+        }
+
 
         //
         //  gameObject removes
-        //  TODO: defrag
+        //  TODO: defrag the game graph
         //
 
         for ( var i = 0, len = _gameGraph.length; i < len; i++ )
@@ -87,6 +100,23 @@ function Director()
         }
 
     } 
+
+    /*
+    *   return a list of destructable gameObjects.
+    *
+    *   @return array<GameObject>
+    */
+    this.filterAsDestructables( gameObjects )
+    {
+        li = [];
+        gameObjects.forEach( function( gameObject )
+        {
+            if ( gameObject oftype Destructable )   // TODO:should I use a type field? 
+                    li.push( gameObject );
+        });
+
+        return li;
+    }
 
     /* setup our level, initialize our cache of actors, etc... */
     this.setupLevelStage = function()

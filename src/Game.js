@@ -1,44 +1,62 @@
+/**
+*   ..Game.js, uly, feb2012..
+*
+*   This is the "main" javaScript file that controls the game from a high-level.
+*   It handles keyboard events, and top-level gameState changes such as pausing.
+*/
 
 //
 //  globals.
 //
-var width = 768, 
-        height = 448,
-        gLoop,
-        _canvas = document.getElementById('id_canvas'), 
-        ctx = _canvas.getContext('2d');
-                
-_canvas.width = width;
-_canvas.height = height;
 
+var g = {
+        canvas: null,
+        ctx: null, 
+        gameLoop: null,
+        width: 768,
+        height: 448, 
+
+        /* the global game state. */
+        gameState: "PLAYING",
+
+        /* the current stage in a level in the game. */
+        stage: 0,
+
+        /* the current "level" in the game. */
+        level: 0 
+
+        };
+
+//
+//  further global variable initialization(s).
+//
+
+g.gameFactory = new GameFactory();
+g.director = new Director();
+g.player = g.gameFactory.getPlayer();
+g.canvas = document.getElementById('id_canvas'), 
+g.ctx = g.canvas.getContext('2d'); 
+g.canvas.width = g.width;
+g.canvas.height = g.height; 
+g.player.setPosition(~~((g.width - g.player.width)/2), ~~((g.height - g.player.height)/2)); 
+
+/*
+*   TODO:I am not sure what this is for!
+*/
 if (!window.console) console = {};
 console.log = console.log || function(){};
 console.warn = console.warn || function(){};
 console.error = console.error || function(){};
 console.info = console.info || function(){};
 
-var clear = function(){
-	ctx.fillStyle = '#808080';  /* background colour. */
-	ctx.clearRect(0, 0, width, height);
-	ctx.beginPath();
-	ctx.rect(0, 0, width, height);
-	ctx.closePath();
-	ctx.fill();
+var clear_canvas = function(){
+	g.ctx.fillStyle = '#808080';  /* background colour. */
+	g.ctx.clearRect(0, 0, g.width, g.height);
+	g.ctx.beginPath();
+	g.ctx.rect(0, 0, g.width, g.height);
+	g.ctx.closePath();
+	g.ctx.fill();
 } 
-
-/* the global game state. */
-var gameState = "";
-
-/* the current stage in a level in the game. */
-var stage = 0;
-
-/* the current "level" in the game. */
-var level = 0;
-
-var gameFactory = new GameFactory();
-var director = new Director();
-var player = director.getPlayer();  
-player.setPosition(~~((width-player.width)/2), ~~((height - player.height)/2)); 
 
 //
 //  input event handlers.
@@ -50,22 +68,22 @@ document.onkeydown = function( event )
     {
         case 87:  /* w */
         case 38:  /* up-arrow */
-            player.setIsMovingUp( true ); 
+            g.player.setIsMovingUp( true ); 
             break;
         case 83:  /* s */
         case 40:  /* down-arrow */
-            player.setIsMovingDown( true );
+            g.player.setIsMovingDown( true );
             break;
         case 65:  /* a */
         case 37:  /* left-arrow */
-            player.setIsMovingLeft( true );
+            g.player.setIsMovingLeft( true );
             break;
         case 68:  /* d */
         case 39:  /* right-arrow */ 
-            player.setIsMovingRight( true );
+            g.player.setIsMovingRight( true );
             break; 
         case 32:  /* spaceBar */
-            player.setIsShooting( true );
+            g.player.setIsShooting( true );
             break; 
         default:
             break;
@@ -78,45 +96,42 @@ document.onkeyup = function( event )
     {
         case 87:  /* w */
         case 38:  /* up-arrow */
-            player.setIsMovingUp( false );
+            g.player.setIsMovingUp( false );
             break;
         case 83:  /* s */
         case 40:  /* down-arrow */
-            player.setIsMovingDown( false );
+            g.player.setIsMovingDown( false );
             break;
         case 65:  /* a */
         case 37:  /* left-arrow */
-            player.setIsMovingLeft( false );
+            g.player.setIsMovingLeft( false );
             break;
         case 68:  /* d */
         case 39:  /* right-arrow */
-            player.setIsMovingRight( false );
+            g.player.setIsMovingRight( false );
             break;
         case 32:  /* spaceBar */
-            player.setIsShooting( false );
+            g.player.setIsShooting( false );
             break; 
         default:
             break;
     }
 }
-//
-//  _the_ game loop.
-//
 
-var GameLoop = function(){
-	clear(); 
+var doGameLoop = function(){
+	clear_canvas(); 
 
-	if ( "PLAYING" == gameState )
+	if ( "PLAYING" == g.gameState )
 	{
-        director.direct(); 
-        director.draw( ctx );
+        g.director.direct(); 
+        g.director.draw( g.ctx );
     }
-    else if ( "PAUSED" == gameState )
+    else if ( "PAUSED" == g.gameState )
     {
         // TODO!
     }
 
-	gLoop = setTimeout(GameLoop, 1000 / 50);    // last!
+	g.gameLoop = setTimeout(GameLoop, 1000 / 50);    // last!
 }
 
 /*
@@ -124,14 +139,14 @@ var GameLoop = function(){
 */
 var main = function()
 {
-    gameState = "PLAYING";
-    level = 1;
-    stage = 1;
+    g.gameState = "PLAYING";
+    g.level = 1;
+    g.stage = 1;
 
-    director.setLevel( level );
-    director.setStage( stage );
-    director.setupLevelStage();
-    GameLoop();
+    g.director.setLevel( g.level );
+    g.director.setStage( g.stage );
+    g.director.setupLevelStage();
+    doGameLoop();
 }
 
 main();

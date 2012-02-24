@@ -1,8 +1,10 @@
 /*
 *   ..player.js, uly, dec2011..
-*
+*   
+*   The player class (singleton), does not inherit from gameObject;
+*   It is it's own beast.
 */
-function Player( canvasWidth, canvasHeight, director )
+function Player()
 { 
 	var that = this;
 
@@ -15,17 +17,17 @@ function Player( canvasWidth, canvasHeight, director )
 	that.height = 32;
 	that.frames = 3;
 	that.actualFrame = 0;
-	that.X = 0;
-	that.Y = 0;	
+	that.x = 0;
+	that.y = 0;	
 	that.interval = 0;
 
     //
     //  private variables.
     //
     
-    var _director = director;
-    var _canvasWidth = canvasWidth;
-    var _canvasHeight = canvasHeight;
+    var _director = g.director;
+    var _canvasWidth = g.width;
+    var _canvasHeight = g.height;
 
     var _isMovingUp =       false;
     var _isMovingDown =     false;
@@ -64,40 +66,40 @@ function Player( canvasWidth, canvasHeight, director )
 
     that.moveLeft = function()
     {
-		if (that.X > 0) 
+		if (that.x > 0) 
         {
-			that.setPosition( that.X - 5, that.Y );
+			that.setPosition( that.x - 5, that.y );
 		}
 	}
 	
 	that.moveRight = function()
     {
-		if (that.X + that.width < _canvasWidth) 
+		if (that.x + that.width < _canvasWidth) 
         {
-			that.setPosition( that.X + 5, that.Y );
+			that.setPosition( that.x + 5, that.y );
 		}
 	}
 
     that.moveUp = function()
     {
-		if (that.Y > 0 ) 
+		if (that.y > 0 ) 
         {
-			that.setPosition( that.X, that.Y - 5 );
+			that.setPosition( that.x, that.y - 5 );
 		}
 	}
 
     that.moveDown = function()
     {
-		if (that.Y + that.height < _canvasHeight ) 
+		if (that.y + that.height < _canvasHeight ) 
         {
-			that.setPosition( that.X, that.Y + 5 );
+			that.setPosition( that.x, that.y + 5 );
 		}
 	}
 
     that.setPosition = function( x, y )
     {
-		that.X = x;
-		that.Y = y;
+		that.x = x;
+		that.y = y;
 	}
 
     that.draw = function( ctx )
@@ -125,8 +127,8 @@ function Player( canvasWidth, canvasHeight, director )
 		try 
         {
 			ctx.drawImage( that.image, 0, that.height * that.actualFrame, 
-                    that.width, that.height, that.X, 
-                    that.Y, that.width, that.height );
+                    that.width, that.height, that.x, 
+                    that.y, that.width, that.height );
 		} 
 		catch ( e ) 
         {
@@ -159,9 +161,8 @@ function Player( canvasWidth, canvasHeight, director )
     */
     that.shoot = function()
     {
-        var zX = that.X + ~~( that.width / 2 );
-        //_gameFactory.newPew( _canvasHeight, zX, that.Y );
-        _director.addPlayerProjectile( _canvasHeight, zX, that.Y );
+        var x = that.x + ~~( that.width / 2 );
+        _director.addPlayerProjectile( x, that.y );
     }
 
     //

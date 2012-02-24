@@ -29,7 +29,7 @@ function GameFactory()
         }
 
         // TODO: consider not passing gameFactory to player...
-        _player = new Player( width, height, this );
+        _player = new Player( g.width, g.height, this );
 
         return _player;
     } 
@@ -49,12 +49,12 @@ function GameFactory()
     *   add a moving projectile called "pew" to the game graph.
     *   Recycle unused pews as necessary.
     */
-    this.newPew = function( canvasHeight, x, y )
+    this.newPew = function( x, y )
     {
         var pew;
         if ( _projectiles.length < MAX_PROJECTILES )
         { 
-            pew = new Pew( canvasHeight, x, y );
+            pew = new Pew( x, y );
             this.addProjectile( pew );
 
             return;
@@ -75,7 +75,7 @@ function GameFactory()
             var elem = _projectiles.shift();
             elem = null;
 
-            pew = new Pew( canvasHeight, x, y );
+            pew = new Pew( x, y );
             this.addProjectile( pew );
 
             return;
@@ -89,17 +89,6 @@ function GameFactory()
         {
             console.warn( "failed to respawn pew." );
         }
-    }
-
-    /**
-    *   draw the game graph.
-    */
-    this.draw = function( ctx )
-    {
-        _projectiles.forEach( function( projectile ) 
-        {  
-            projectile.draw( ctx );
-        });
     }
 
     //

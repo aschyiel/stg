@@ -1,12 +1,15 @@
 /*
 *   ..Pew.js, uly, dec2011..
 *
-*   TODO:abstract base class as Projectile.js
-*   TODO:handle collision.
+*   The Pew represents the most simplest weapon type.   
+*   it inherits from Projectile.
 *
 */
-function Pew( theCanvasHeight, theX, theY )
+Pew.prototype = new Projectile();
+Pew.prototype.constructor = Pew; 
+function Pew( x, y )
 { 
+    Projectile.call( this );
 	var that = this;
 
     //
@@ -16,15 +19,14 @@ function Pew( theCanvasHeight, theX, theY )
 	that.image.src = "../media/pew.png";
 	that.width =    24;
 	that.height =   72;
-	that.X = theX;
-	that.Y = theY;	
+	that.x = x;
+	that.y = y;	
     that.type = "Pew";
 
     //
     //  private variables.
     //
 
-    var _canvasHeight = theCanvasHeight; 
     var _velocity = 15;
 
     //
@@ -38,9 +40,9 @@ function Pew( theCanvasHeight, theX, theY )
 
     that.moveUp = function()
     {
-		if (that.Y > 0 ) 
+		if (that.y > 0 ) 
         {
-			that.setPosition( that.X, that.Y - _velocity );
+			that.setPosition( that.x, that.y - _velocity );
 		}
         else
         {
@@ -50,8 +52,8 @@ function Pew( theCanvasHeight, theX, theY )
 
     that.setPosition = function( x, y )
     {
-		that.X = x;
-		that.Y = y;
+		that.x = x;
+		that.y = y;
 	}
 
     that.draw = function( ctx )
@@ -65,7 +67,7 @@ function Pew( theCanvasHeight, theX, theY )
 
 		try 
         {
-			ctx.drawImage( that.image, that.X, that.Y );
+			ctx.drawImage( that.image, that.x, that.y );
 		} 
 		catch ( e ) 
         {
@@ -89,8 +91,8 @@ function Pew( theCanvasHeight, theX, theY )
     that.disable = function()
     {
         _disabled = true;
-        that.X = -that.width;
-        that.Y = -that.height;
+        that.x = -that.width;
+        that.y = -that.height;
     }
 }
 

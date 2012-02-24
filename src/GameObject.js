@@ -46,7 +46,14 @@ function GameObject( x, y )
     */
     that.draw = function( ctx )
     {
-        //..
+        try 
+        {
+			ctx.drawImage( that.image, that.x, that.y );
+		} 
+		catch ( e ) 
+        {
+            console.warn( e );
+		}; 
 	}
 
     /*
