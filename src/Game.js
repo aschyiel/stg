@@ -23,7 +23,10 @@ var g = {
         stage: 0,
 
         /* the current "level" in the game. */
-        level: 0 
+        level: 0,
+
+        /* show status via labels such as game progress. */
+        showStats: true
 
         };
 

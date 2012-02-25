@@ -46,6 +46,11 @@ function Director()
     this.direct = function()
     {
         _levelProgress += 1;
+        if ( g.showStats )
+        {
+            //g.ctx.fillText( 'levelProgress:'+_levelProgress, 0, g.height - 50 );
+            g.ctx.fillText( 'levelProgress:'+_levelProgress, 50, 50 );
+        }
 
         //
         //  introduce level elements based on our level progress.

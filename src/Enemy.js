@@ -15,9 +15,9 @@ function Enemy( x, y )
     //  public variables.
     // 
 	that.image = new Image(); 
-	that.image.src = "../media/pew.png";
-	that.width =    24;
-	that.height =   72;
+	that.image.src = "../media/enemy.png";
+	that.width =    32;
+	that.height =  128;
     that.type = "Enemy";
 
     //
