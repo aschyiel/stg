@@ -14,7 +14,7 @@ function Director()
     //  private variables.
     //
 
-    var _gameGraph = new Array();
+    var _gameGraph = new Array(); 
 
     /* the current level-stage the director is directing. */ 
     var _stage = 0;
@@ -24,6 +24,8 @@ function Director()
 
     /* the current level progress.  To be used to figure out what level elements to "introduce" into the set. */
     var _levelProgress = 0;
+
+
 
     //
     //  public methods.
@@ -74,10 +76,11 @@ function Director()
         //  loop through all projectiles, and see if they hit anything.
         //
 
-        var destructables = filterAsDestructables( _gameGraph ); 
-        for ( var i = 0, length = _projectiles.length; i < length; i++ )
+        var destructables = this.filterAsDestructables( _gameGraph ); 
+        var projectiles = this.filterAsProjectiles( _gameGraph );
+        for ( var i = 0, length = projectiles.length; i < length; i++ )
         {
-            var projectile = _projectiles[ i ]; 
+            var projectile = projectiles[ i ]; 
             destructables.forEach( function( destructable )
             {
                 if ( projectile.isTouching( destructable ) )
@@ -102,16 +105,52 @@ function Director()
     } 
 
     /*
+    *   draw everything, to be called from Game.js.
+    */
+    this.draw = function()
+    {
+        _gameGraph.forEach( function( gameObject )
+        {
+            gameObject.draw( g.ctx );
+        }); 
+    }
+
+    /*
+    *   return a sub list of projectile (damage dealing) gameObjects.
+    *
+    *   @param gameObjects  an arrya of GameObject.
+    *   @return array<Projectile>
+    */
+    this.filterAsProjectiles = function ( gameObjects ) 
+    {
+        if ( !gameObjects )
+                return [];
+
+        var ki = [];
+        gameObjects.forEach( function( gameObject )
+        {
+            if ( gameObject.isProjectile() )   
+                    ki.push( gameObject );
+        });
+
+        return ki;
+
+    }
+
+    /*
     *   return a list of destructable gameObjects.
     *
     *   @return array<GameObject>
     */
-    this.filterAsDestructables( gameObjects )
+    this.filterAsDestructables = function( gameObjects )
     {
-        li = [];
+        if ( !gameObjects )
+                return [];
+
+        var li = [];
         gameObjects.forEach( function( gameObject )
         {
-            if ( gameObject oftype Destructable )   // TODO:should I use a type field? 
+            if ( gameObject.isDestructable() )   
                     li.push( gameObject );
         });
 

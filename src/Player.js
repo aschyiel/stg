@@ -165,6 +165,14 @@ function Player()
         _director.addPlayerProjectile( x, that.y );
     }
 
+    /*
+    *   from GameObject interface.
+    */
+    that.isDestructable = function()
+    {
+        return false;   // TODO!
+    }
+
     //
     //  private methods.
     //

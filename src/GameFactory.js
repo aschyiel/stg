@@ -45,6 +45,20 @@ function GameFactory()
     var MAX_PROJECTILES = 64;
     var PROJECTILE_TYPE_PEW = "Pew";
 
+    this.newEnemy = function( x, y )
+    {
+        if ( !x )
+                x = ~~(g.width / 2)
+
+        if ( !y )
+                y = 0;  //..default to the top..
+
+        var enemy = new Enemy();
+        enemy.setPosition( x, y );
+
+        return enemy;
+    }
+
     /**
     *   add a moving projectile called "pew" to the game graph.
     *   Recycle unused pews as necessary.

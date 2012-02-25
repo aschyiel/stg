@@ -131,7 +131,7 @@ var doGameLoop = function(){
         // TODO!
     }
 
-	g.gameLoop = setTimeout(GameLoop, 1000 / 50);    // last!
+	g.gameLoop = setTimeout( doGameLoop, 1000 / 50);    // last!
 }
 
 /*
