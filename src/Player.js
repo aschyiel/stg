@@ -1,8 +1,17 @@
 /*
 *   ..player.js, uly, dec2011..
 *   
-*   The player class (singleton), does not inherit from gameObject;
-*   It is it's own beast.
+*   The player class (singleton) is it's own breast, and does not inherit from gameObject;
+*   Instead it implements a bunch of GameObject methods,
+*   and uses a has-a-gameObject relationship instead of the usual is-a-thing.
+*
+*   The player knows it's position and all of it's attributes.
+*   It is up to the player to translate this to it's gameObject representation.
+*
+*   The Player is part of the gameGraph along with all the other gameObjects,
+*   and receives the normal tick/draw messages as managed by the director.
+*
+*   TODO:make player a decoration and not a thing!
 */
 function Player()
 { 
@@ -11,21 +20,15 @@ function Player()
     //
     //  public variables.
     // 
-	that.image = new Image(); 
-	that.image.src = "../media/player.png"
-	that.width = 32;
-	that.height = 32;
-	that.frames = 3;
-	that.actualFrame = 0;
+    that.width = 32;
+	that.height = 32; 
 	that.x = 0;
 	that.y = 0;	
-	that.interval = 0;
 
     //
     //  private variables.
     //
     
-    var _director = g.director;
     var _canvasWidth = g.width;
     var _canvasHeight = g.height;
 
@@ -35,9 +38,45 @@ function Player()
     var _isMovingRight =    false;
     var _isShooting = false;
 
+    /* 
+    *   The GameObject controlled by the player,
+    *   the idea is tha you can swap in and out different gameObjects that the player controls.
+    */
+    var _gameObject = new GameObject();
+
     //
     //  public methods.
     //
+
+    /*
+    *   initialze/setup the player's gameObject;
+    *   to be called each time we want to swap in/out the player's character.
+    *
+    *   assumes the image source uses the dimensions 32x128, and contains 4 frames of 32x32.
+    */
+    that.initGameObject = function( image )
+    {
+        _gameObject.image = image;
+
+        // TODO: gameObject.reset()
+        _gameObject.currentFrame = 0; 
+        _gameObject.interval = 0;
+        _gameObject.maxInterval = 4;
+        _gameObject.frames = 3;
+        _gameObject.x = that.x;
+        _gameObject.y = that.y;
+        _gameObject.width =  32;
+        _gameObject.height = 32; 
+    }
+
+    /* to be called what spawning the player. */
+    that.setupDefaultGameObject = function()
+    {
+        var image = new Image(); 
+        var image.src = "../media/player.png";  //..32x128..
+
+        that.initGameObject( image );
+    }
 
     that.setIsShooting = function( b )
     {
@@ -102,7 +141,10 @@ function Player()
 		that.y = y;
 	}
 
-    that.draw = function( ctx )
+    /*
+    *   implemention of GameObject.tick
+    */
+    that.tick = function()
     {
         if ( _isMovingUp )
         {
@@ -122,39 +164,24 @@ function Player()
         if ( _isMovingRight )
         {
             that.moveRight(); 
-        }
+        } 
 
-		try 
+        if ( _isShooting )
         {
-			ctx.drawImage( that.image, 0, that.height * that.actualFrame, 
-                    that.width, that.height, that.x, 
-                    that.y, that.width, that.height );
-		} 
-		catch ( e ) 
-        {
-            //..
-		};
-		
-		if (that.interval == 4 ) 
-        {
-			if (that.actualFrame == that.frames) 
-            {
-				that.actualFrame = 0;
+            that.shoot();
+        } 
 
-                if ( _isShooting )
-                {
-                    that.shoot();
-                }
-			}
-			else 
-            {
-				that.actualFrame++;
-			}
-			that.interval = 0;
-		}
+        _gameObject.setPosition( that.x, that.y );
+        _gameObject.tick();
+    } 
 
-		that.interval++;		
-	}
+    /*
+    *   implementation of GameObject.draw()
+    */
+    that.draw = function( ctx )
+    {
+        _gameObject.draw( ctx );
+    }
 
     /*
     *   add a projectile shot by the player into the game via the director.
@@ -162,7 +189,7 @@ function Player()
     that.shoot = function()
     {
         var x = that.x + ~~( that.width / 2 );
-        _director.addPlayerProjectile( x, that.y );
+        g.director.addPlayerProjectile( x, that.y );
     }
 
     /*
@@ -170,18 +197,12 @@ function Player()
     */
     that.isDestructable = function()
     {
-        return false;   // TODO!
+        return _gameObject.isDestructable();
     }
 
     //
     //  private methods.
-    //
-
-
-	
-	
-	
-
+    // 
 	
 }
 

@@ -31,6 +31,18 @@ function GameObject( x, y )
 
     that.type = "GameObject";
 
+    /* the tick interval inbetween animation frames. */
+    that.interval = 0;
+
+    /* the maximum tick intervals to wait inbetween switching animation frames. */
+    that.maxInterval = 4;
+
+    /* total number of animation frames (zero based). */
+    that.frames = 3
+    
+    /* the current animation frame. */
+    that.currentFrame = 0;
+
     //
     //  private variables.
     //
@@ -58,8 +70,6 @@ function GameObject( x, y )
     }
 
     /*
-    *   draw this gameObject.
-    */
     that.draw = function( ctx )
     {
         try 
@@ -71,6 +81,39 @@ function GameObject( x, y )
             console.warn( e );
 		}; 
 	}
+	*/
+
+    /*
+    *   draw this gameObject (crops source image).
+    */ 
+    that.draw = function( ctx )
+    {
+		try 
+        { 
+			ctx.drawImage( that.image, 0, that.height * that.currentFrame, 
+                    that.width, that.height, that.x, 
+                    that.y, that.width, that.height );
+		} 
+		catch ( e ) 
+        {
+            //..
+		};
+		
+		if (that.interval == that.maxInterval ) 
+        {
+			if (that.currentFrame == that.frames) 
+            {
+				that.currentFrame = 0; 
+			}
+			else 
+            {
+				that.currentFrame++;
+			}
+			that.interval = 0;
+		}
+
+		that.interval++;		
+	} 
 
     /*
     *   indicate if this gameObject needs to be removed from the gameGraph.

@@ -17,7 +17,8 @@ function Enemy( x, y )
 	that.image = new Image(); 
 	that.image.src = "../media/enemy.png";
 	that.width =    32;
-	that.height =  128;
+	that.height =   32;
+	that.frames = 3;
     that.type = "Enemy";
 
     //

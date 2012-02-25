@@ -23,9 +23,7 @@ function Director()
     var _level = 0;
 
     /* the current level progress.  To be used to figure out what level elements to "introduce" into the set. */
-    var _levelProgress = 0;
-
-
+    var _levelProgress = 0; 
 
     //
     //  public methods.
@@ -196,6 +194,16 @@ function Director()
     this.setLevel = function( level )
     {
         _level = level;
+    }
+
+    /*
+    *   add a gameObject to the gameGraph.
+    *
+    *   ie. adding ap layer to the game graph.
+    */
+    this.addToGraph = function( gameObject )
+    { 
+        _gameGraph.push( gameObject ); 
     }
 
     //
