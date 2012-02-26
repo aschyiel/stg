@@ -32,9 +32,9 @@ function Enemy( x, y )
     //  public methods.
     // 
 
-    that.tick = function()
+    Enemy.prototype.tick = function()
     { 
-        Enemy.prototype.tick.call( this ); //..aka super.tick();..
+        GameObject.prototype.tick.call( this ); //..aka super.tick();..
     }
 
     //

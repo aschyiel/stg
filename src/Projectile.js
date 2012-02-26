@@ -19,8 +19,6 @@ function Projectile( x, y )
 
     that.width =    24;
 	that.height =   72;
-	that.x = x;
-	that.y = y;	
     that.type = "Projectile";
 
     /* velocity in the x direction. */
@@ -29,16 +27,26 @@ function Projectile( x, y )
     /* velocity in the y direction. */
     that.vy = -10;
 
+    /* has our projectile collided/touched a destructable item yet? */
+    that.hasCollision = false; 
+
     //
     //  private variables.
     //
 
-    /* has our projectile collided/touched a destructable item yet? */
-    that._hasCollision = false; 
-
     //
     //  public methods.
     // 
+
+    that.tick = function()
+    {
+        GameObject.prototype.tick.call(this);
+
+        if ( that.y < -(that.height) )
+        {
+            that.disable();
+        }
+    }
 
     /*
     *   overrides GameObject.needsRemoved

@@ -48,6 +48,29 @@ function GameObject( x, y )
     //  private variables.
     //
 
+    /* is this gameObject disabled.  Is it to be sequestored inbetween respawn. */
+    var _disabled = false;
+
+    //
+    //  public prototype (extendable) methods
+    //
+
+    /*
+    *   tick one for a turn.
+    *
+    */
+    GameObject.prototype.tick = function()
+    {
+        if ( that.x + that.width < 0 
+            || that.x + that.width > g.width )
+                that.vx = -( that.vx ); //..flip velocity..  
+
+        that.x += that.vx;
+        that.y += that.vy;
+
+        that.setPosition( x, y ); 
+    } 
+
     //
     //  public methods.
     //
@@ -59,42 +82,14 @@ function GameObject( x, y )
 	}
 
     /*
-    *   tick one for a turn.
-    *
-    */
-    that.tick = function()
-    {
-        if ( that.x + that.width < 0 
-            || that.x + that.width > g.width )
-                that.vx = -( that.vx ); //..flip velocity..  
-
-        that.x += that.vx;
-        that.y += that.vy;
-
-        that.setPosition( x, y );
-    }
-
-    /*
-    that.draw = function( ctx )
-    {
-        try 
-        {
-			ctx.drawImage( that.image, that.x, that.y );
-		} 
-		catch ( e ) 
-        {
-            console.warn( e );
-		}; 
-	}
-	*/
-
-    /*
     *   draw this gameObject (crops source image).
     */ 
     that.draw = function( ctx )
     {
 		try 
         { 
+			//ctx.drawImage( that.image, that.x, that.y );
+
 			ctx.drawImage( that.image, 0, that.height * that.currentFrame, 
                     that.width, that.height, that.x, 
                     that.y, that.width, that.height );
@@ -150,6 +145,26 @@ function GameObject( x, y )
     {
         return false;
     }
+
+    /* sequestor this object and move off screen. */
+    that.disable = function()
+    {
+        _disabled = true;
+        that.x = -that.width;
+        that.y = -that.height;
+    } 
+
+    that.isDisabled = function()
+    {
+        return true == _disabled;
+    }
+
+    that.respawn = function( pX, pY )
+    {
+        _disabled = false;
+        that.setPosition( pX, pY );
+    }
+
 
     //
     //  private methods.

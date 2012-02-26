@@ -44,11 +44,6 @@ function Director()
     this.direct = function()
     {
         _levelProgress += 1;
-        if ( g.showStats )
-        {
-            //g.ctx.fillText( 'levelProgress:'+_levelProgress, 0, g.height - 50 );
-            g.ctx.fillText( 'levelProgress:'+_levelProgress, 50, 50 );
-        }
 
         //
         //  introduce level elements based on our level progress.
@@ -112,6 +107,16 @@ function Director()
     */
     this.draw = function()
     {
+        //
+        //  additional debug text to show before calling drawImage.
+        //
+        if ( g.showStats )
+        { 
+            var s = "levelProgress:"+_levelProgress
+            g.ctx.fillStyle = 'yellow';
+            g.ctx.fillText( s, 50, 50 );
+        } 
+
         _gameGraph.forEach( function( gameObject )
         {
             gameObject.draw( g.ctx );
