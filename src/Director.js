@@ -102,7 +102,7 @@ function Director()
         {
             var gameObject = _gameGraph[ i ];
             if ( gameObject.needsRemoved() )
-                    _gameGraph[ i ] = null;
+                    _gameGraph.slice( i, i );   //..remove the element from the gameGraph!..
         }
 
     } 
@@ -168,7 +168,7 @@ function Director()
         // TODO:make this more configurable...
 
         _levelGuide[ 10 ] = [ 1 ];   // at level progress of "10", introduce a single "enemy" of type 1.
-        _levelGuide[ 30 ] = [ 1 ];
+        //_levelGuide[ 30 ] = [ 1 ];
     }
 
     /* "enum" representing an enemy actor type. */

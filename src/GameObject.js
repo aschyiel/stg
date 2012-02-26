@@ -24,7 +24,8 @@ function GameObject( x, y )
 	that.y = y;	
 
 	/* velocity in the x direction. */
-    that.vx = 0; 
+    //that.vx = 0; 
+    that.vx = 3; 
 
 	/* velocity in the y direction. */
     that.vy = 0;
@@ -63,6 +64,10 @@ function GameObject( x, y )
     */
     that.tick = function()
     {
+        if ( that.x + that.width < 0 
+            || that.x + that.width > g.width )
+                that.vx = -( that.vx ); //..flip velocity..  
+
         that.x += that.vx;
         that.y += that.vy;
 

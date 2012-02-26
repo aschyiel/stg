@@ -73,7 +73,7 @@ function Player()
     that.setupDefaultGameObject = function()
     {
         var image = new Image(); 
-        var image.src = "../media/player.png";  //..32x128..
+        image.src = "../media/player.png";  //..32x128..
 
         that.initGameObject( image );
     }
@@ -189,7 +189,8 @@ function Player()
     that.shoot = function()
     {
         var x = that.x + ~~( that.width / 2 );
-        g.director.addPlayerProjectile( x, that.y );
+        var projectile = g.gameFactory.newPew( x, that.y );  //..TODO:choose based on weapon selected..
+        g.director.addToGraph( projectile );
     }
 
     /*
@@ -198,6 +199,24 @@ function Player()
     that.isDestructable = function()
     {
         return _gameObject.isDestructable();
+    }
+
+    /*
+    *   required for GameObject implementation.
+    */
+    that.isProjectile = function()
+    {
+        return false;
+    }
+
+    /*
+    *   required for GameObject implementation.
+    */ 
+    that.needsRemoved = function()
+    {
+        // TODO:handle temporarily removing the player some other way?
+
+        return false;
     }
 
     //

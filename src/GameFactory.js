@@ -60,8 +60,10 @@ function GameFactory()
     }
 
     /**
-    *   add a moving projectile called "pew" to the game graph.
+    *   return a moving projectile called "pew".
     *   Recycle unused pews as necessary.
+    *
+    *   @return pew object to be (re-)inserted into the gameGraph.
     */
     this.newPew = function( x, y )
     {
@@ -71,7 +73,7 @@ function GameFactory()
             pew = new Pew( x, y );
             this.addProjectile( pew );
 
-            return;
+            return pew;
         }
 
         _projectiles.forEach( function( projectile ) 
@@ -92,7 +94,7 @@ function GameFactory()
             pew = new Pew( x, y );
             this.addProjectile( pew );
 
-            return;
+            return pew;
         }
 
         if ( pew )
@@ -103,6 +105,8 @@ function GameFactory()
         {
             console.warn( "failed to respawn pew." );
         }
+
+        return pew;
     }
 
     //

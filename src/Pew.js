@@ -17,6 +17,9 @@ function Pew( x, y )
     // 
 	that.image = new Image(); 
 	that.image.src = "../media/pew.png";
+
+    that.frames = 0;    // only a single frame to draw!
+
 	that.width =    24;
 	that.height =   72;
 	that.x = x;
@@ -49,12 +52,6 @@ function Pew( x, y )
             that.disable();
         }
 	} 
-
-    that.setPosition = function( x, y )
-    {
-		that.x = x;
-		that.y = y;
-	}
 
     that.draw = function( ctx )
     {

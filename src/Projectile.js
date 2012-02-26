@@ -41,27 +41,6 @@ function Projectile( x, y )
     // 
 
     /*
-    *   tick one for a turn.
-    *
-    */
-    that.tick = function()
-    {
-        this.x += vx;
-        this.y += vy;
-    }
-
-    /*
-    *   overriden from GameObject
-    */
-    /*
-    that.draw = function( ctx )
-    {
-        GameObject.prototype.draw.call( this );
-        //..
-	}
-	*/
-
-    /*
     *   overrides GameObject.needsRemoved
     */
     that.needsRemoved = function()
