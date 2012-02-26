@@ -20,33 +20,32 @@ function GameObject( x, y )
     that.width =    0;
 	that.height =   0;
 
-	that.x = x;
-	that.y = y;	
-
-	/* velocity in the x direction. */
-    //that.vx = 0; 
-    that.vx = 3; 
-
-	/* velocity in the y direction. */
-    that.vy = 0;
-
-    that.type = "GameObject";
-
-    /* the tick interval inbetween animation frames. */
-    that.interval = 0;
-
-    /* the maximum tick intervals to wait inbetween switching animation frames. */
-    that.maxInterval = 4;
-
-    /* total number of animation frames (zero based). */
-    that.frames = 3
-    
-    /* the current animation frame. */
-    that.currentFrame = 0;
+    that.type = "GameObject"; 
 
     //
     //  private variables.
     //
+
+    /* the current animation frame. */
+    var _currentFrame = 0;
+
+	var _x = x;
+	var _y = y;	
+
+	/* velocity in the x direction. */
+    var _vx = 0; 
+
+	/* velocity in the y direction. */
+    var _vy = 0; 
+
+    /* the tick interval inbetween animation frames. */
+    var _interval = 0;
+
+    /* the maximum tick intervals to wait inbetween switching animation frames. */
+    var _maxInterval = 8;
+
+    /* total number of animation frames (zero based). */
+    var _frames = 3
 
     /* is this gameObject disabled.  Is it to be sequestored inbetween respawn. */
     var _disabled = false;
@@ -61,12 +60,12 @@ function GameObject( x, y )
     */
     GameObject.prototype.tick = function()
     {
-        if ( that.x + that.width < 0 
-            || that.x + that.width > g.width )
-                that.vx = -( that.vx ); //..flip velocity..  
+        if ( _x + that.width < 0 
+            || _x + that.width > g.width )
+                _vx = -( _vx ); //..flip velocity..  
 
-        that.x += that.vx;
-        that.y += that.vy;
+        _x += _vx;
+        _y += _vy;
 
         that.setPosition( x, y ); 
     } 
@@ -75,10 +74,15 @@ function GameObject( x, y )
     //  public methods.
     //
 
+    that.setFrames = function( frames )
+    {
+        _frames = frames;
+    }
+
     that.setPosition = function( x, y )
     {
-		that.x = x;
-		that.y = y;
+		_x = x;
+		_y = y;
 	}
 
     /*
@@ -88,31 +92,31 @@ function GameObject( x, y )
     {
 		try 
         { 
-			//ctx.drawImage( that.image, that.x, that.y );
+			//ctx.drawImage( that.image, _x, _y );
 
-			ctx.drawImage( that.image, 0, that.height * that.currentFrame, 
-                    that.width, that.height, that.x, 
-                    that.y, that.width, that.height );
+			ctx.drawImage( that.image, 0, that.height * _currentFrame, 
+                    that.width, that.height, _x, 
+                    _y, that.width, that.height );
 		} 
 		catch ( e ) 
         {
             //..
 		};
 		
-		if (that.interval == that.maxInterval ) 
+		if (_interval == _maxInterval ) 
         {
-			if (that.currentFrame == that.frames) 
+			if (_currentFrame == _frames) 
             {
-				that.currentFrame = 0; 
+				_currentFrame = 0; 
 			}
 			else 
             {
-				that.currentFrame++;
+				_currentFrame++;
 			}
-			that.interval = 0;
+			_interval = 0;
 		}
 
-		that.interval++;		
+		_interval++;		
 	} 
 
     /*
@@ -150,8 +154,8 @@ function GameObject( x, y )
     that.disable = function()
     {
         _disabled = true;
-        that.x = -that.width;
-        that.y = -that.height;
+        _x = -that.width;
+        _y = -that.height;
     } 
 
     that.isDisabled = function()
