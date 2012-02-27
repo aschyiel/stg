@@ -45,6 +45,10 @@ g.canvas.width = g.width;
 g.canvas.height = g.height; 
 g.player.setPosition(~~((g.width - g.player.width)/2), ~~((g.height - g.player.height)/2)); 
 
+g.images = new Object();
+g.images.pew = new Image();
+g.images.pew.src = "../media/pew.png"; 
+
 /*
 *   TODO:I am not sure what this is for!
 */

@@ -67,6 +67,9 @@ function GameFactory()
     */
     this.newPew = function( x, y )
     {
+        var zx = x;
+        var zy = y;
+
         var pew = new Pew( x, y );
 
         return pew; 

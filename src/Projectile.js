@@ -1,34 +1,19 @@
 /*
 *   ..Projectile.js, uly, feb2012
 *
-*   Projectile is the base class representing weapon projectiles that can deal damage to stuff.
-*   Projectile directly inherits from GameObject.
+*   This add-on-class is responsible for all the basic collision stuff regarding damage dealing things;
+*   and is designed to decorate a gameObject-duck-typed class such as "Pew".
+*
+*   note:drawing is NOT handled here!
 *
 */
-Projectile.prototype = new GameObject();
-Projectile.prototype.constructor = Projectile; 
 function Projectile( x, y )
 { 
-    GameObject.call( this );
-
 	var that = this;
 
     //
-    //  public variables.
+    //  "public" variables.
     // 
-
-    that.width =    24;
-	that.height =   72;
-    that.type = "Projectile";
-
-    /* velocity in the x direction. */
-    that.vx = 0; 
-
-    /* velocity in the y direction. */
-    that.vy = -10;
-
-    /* has our projectile collided/touched a destructable item yet? */
-    that.hasCollision = false; 
 
     //
     //  private variables.
@@ -38,31 +23,32 @@ function Projectile( x, y )
     //  public methods.
     // 
 
-    that.tick = function()
-    {
-        GameObject.prototype.tick.call(this);
-
-        if ( that.y < -(that.height) )
-        {
-            that.disable();
-        }
-    }
-
     /*
-    *   overrides GameObject.needsRemoved
+    *   Projectile implementation of needsRemoved.
+    *   TODO:check disablement elsewhere...
+    *   TODO:check collision...
+    *
+    *   @return boolean.
     */
     that.needsRemoved = function()
     { 
+        if ( true == this.hasCollision )
+                return true; 
+
         //
         //  if off map, then we don't need the projectile anymore.
         //
-        if ( this.x + this.width < 0
-            || this.x + this.width > g.canvas.width
-            || this.y < 0
-            || this.y + this.height > g.canvas.height )
-                return true;
+        if ( that.x + that.width < 0
+            || that.x + that.width > g.canvas.width
+            || that.y < 0
+            || that.y + that.height > g.canvas.height )
+        {
+            that.prototype.disable();
 
-        return this._hasCollision;
+            return true;
+        } 
+
+        return false;
     }
 
     //

@@ -9,36 +9,29 @@ Enemy.prototype.constructor = Enemy;
 function Enemy( x, y )
 { 
     GameObject.call( this );
-	var that = this;
-
-    //GameObject.prototype.setPosition( x, y );
-    Enemy.prototype.setPosition.call( this, x, y );
+	var that = this; 
+    
+    that.x = x;
+    that.y = y;
 
     //
     //  public variables.
     // 
-	//that.image = new Image(); 
-	//that.image.src = "../media/enemy.png";
-	var _image = new Image(); 
-	_image.src = "../media/enemy.png";
 
-    Enemy.prototype.image = _image;
+    // TODO:use g.images
+	that.image = new Image(); 
+	that.image.src = "../media/enemy.png";
 
-    Enemy.prototype.width = 32;
-    Enemy.prototype.height = 32;
-
-    Enemy.prototype.setFrames.call( this, 3 );
-
+    that.frames = 3; 
 	that.width =    32;
 	that.height =   32;
     that.type = "Enemy";
+    that.vx = 3;
+    that.vy = 3; 
 
     //
     //  private variables.
     //
-
-    GameObject.prototype.vx = 15
-    GameObject.prototype.vy = 1; 
 
     //
     //  public methods.
