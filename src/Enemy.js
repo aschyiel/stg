@@ -27,11 +27,6 @@ function Enemy( x, y )
 	that.height =   32;
     that.type = "Enemy"; 
 
-    /*
-    that.vx = 3;
-    that.vy = 1; 
-    */
-
     //
     //  private variables.
     //

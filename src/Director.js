@@ -121,6 +121,7 @@ function Director()
         {
             gameObject.draw( g.ctx );
         }); 
+        g.player.draw( g.ctx ); // re-draw player last! (BUG:player draws twice).
     }
 
     /*
