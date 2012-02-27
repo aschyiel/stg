@@ -90,6 +90,9 @@ document.onkeydown = function( event )
         case 32:  /* spaceBar */
             g.player.setIsShooting( true );
             break; 
+        case 80:    /* "p" */
+            togglePause();
+            break;
         default:
             break;
     }
@@ -121,19 +124,30 @@ document.onkeyup = function( event )
         default:
             break;
     }
+} 
+
+/*
+*   toggle the game's pause state.
+*   TODO:use enum...
+*/
+var togglePause = function()
+{
+    g.gameState = ( g.gameState == "PAUSED" )? "PLAYING" : "PAUSED";
 }
 
 var doGameLoop = function(){
-	clear_canvas(); 
+
 
 	if ( "PLAYING" == g.gameState )
-	{
+	{ 
+        clear_canvas(); 
         g.director.direct(); 
         g.director.draw( g.ctx );
     }
     else if ( "PAUSED" == g.gameState )
     {
-        // TODO!
+        g.ctx.fillStyle = 'yellow';
+        g.ctx.fillText( 'PAUSED', g.width / 2, g.height / 2 ); 
     }
 
 	g.gameLoop = setTimeout( doGameLoop, 1000 / 50);    // last!
