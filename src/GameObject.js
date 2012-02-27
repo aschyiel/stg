@@ -62,7 +62,10 @@ function GameObject( x, y )
     *
     */
     GameObject.prototype.tick = function()
-    {
+    { 
+        //
+        //  TODO:this probably doesn't belong here!
+        //
         if ( that.x + that.width < 0 
             || that.x + that.width > g.width )
                 that.vx = -( that.vx ); //..flip velocity..  
