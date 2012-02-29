@@ -28,9 +28,11 @@ function Projectile( x, y )
     *   TODO:check disablement elsewhere...
     *   TODO:check collision...
     *
+    *   "this" is assumed to be a gameObject implementation.
+    *
     *   @return boolean.
     */
-    that.needsRemoved = function()
+    Projectile.prototype.needsRemoved = function()
     { 
         if ( true == this.hasCollision )
                 return true; 
@@ -38,12 +40,12 @@ function Projectile( x, y )
         //
         //  if off map, then we don't need the projectile anymore.
         //
-        if ( that.x + that.width < 0
-            || that.x + that.width > g.canvas.width
-            || that.y < 0
-            || that.y + that.height > g.canvas.height )
+        if ( this.x + this.width < 0
+            || this.x + this.width > g.canvas.width
+            || this.y < 0
+            || this.y + this.height > g.canvas.height )
         {
-            that.prototype.disable();
+            this.disable();
 
             return true;
         } 

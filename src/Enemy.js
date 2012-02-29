@@ -70,14 +70,7 @@ function Enemy( x, y )
 
         that.x += that.vx;
         that.y += that.vy;
-    }
-
-    /*
-    Enemy.prototype.tick = function()
-    { 
-        GameObject.prototype.tick.call( this ); //..aka super.tick();..
-    }
-    */
+    } 
 
     //
     //  private methods.

@@ -21,9 +21,7 @@ function Pew( x, y )
     that.image = g.images.pew;
     that.height = 72;
     that.width = 24;
-    that.vx = 0;
-    that.vy = 15;
-    //that.setPosition( x, y );
+    that.vy = -5;  //..shoots up thus negative..
     that.x = x;
     that.y = y;
     that.frames = 0;
@@ -32,45 +30,15 @@ function Pew( x, y )
     //  private variables.
     // 
 
-    /*
-    var _gameObject = new GameObject();
-    _gameObject.setPosition( x, y );
-    _gameObject.width =  24;
-    _gameObject.height = 72;
-    _gameObject.vx = 0;
-    _gameObject.vy = 15;
-    _gameObject.frames = 0; 
-    _gameObject.image = g.images.pew; 
-    */
-
     //
     //  public interface implementations.
     // 
 
-    /* implementation draw method. */
-    /*
-    that.draw = function( ctx )
+    Pew.prototype.tick = function()
     {
-        that.gameObject.draw( ctx );
-    }
-    */
+        GameObject.prototype.tick.call( this ); 
 
-    /* implementation of tick. */
-    /*
-    that.tick = function()
-    {
-        that.gameObject.tick();
-
-        if ( Pew.prototype.needsRemoved )
-                return; 
-    } 
-    */
-
-    that.tick = function()
-    {
-        GameObject.prototype.tick.call( this );
-
-        //if ( Pew.prototype.needsRemoved )
+        //if ( Projectile.prototype.needsRemoved.call( this ) )
         //        return; 
     }
 
