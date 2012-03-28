@@ -90,6 +90,8 @@ function GameObject( x, y )
 
 		that.x = x;
 		that.y = y;
+
+		return that;
 	}
 
     /*

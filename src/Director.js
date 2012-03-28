@@ -45,20 +45,20 @@ function Director()
     {
         _levelProgress += 1;
 
-        //
-        //  introduce level elements based on our level progress.
-        //
-        var newActors = _levelGuide[ _levelProgress ];
-        if ( newActors )
-        {
-            newActors.forEach( function( actorType ) 
-            {  
-                if ( ENEMY == actorType )
-                {
-                    _gameGraph.push( g.gameFactory.newEnemy() ); // TODO:change position
-                }
-            }); 
-        }
+//      //
+//      //  introduce level elements based on our level progress.
+//      //
+//      var newActors = _levelGuide[ _levelProgress ];
+//      if ( newActors )
+//      {
+//          newActors.forEach( function( actorType ) 
+//          {  
+//              if ( ENEMY == actorType )
+//              {
+//                  _gameGraph.push( g.gameFactory.newEnemy() ); // TODO:change position
+//              }
+//          }); 
+//      }
 
         //
         //  movement.
@@ -169,12 +169,59 @@ function Director()
     /* setup our level, initialize our cache of actors, etc... */
     this.setupLevelStage = function()
     {
-        _levelGuide = new Object();
+        //TODO level factory
+        this.setup_level_one(); 
+    }
 
-        // TODO:make this more configurable...
+    /*
+    *   generate our first level,
+    *   by spreading a two dozen enemies in a checkered formation,
+    *   and initializing our player.
+    *
+    */
+    this.setup_level_one = function()
+    { 
+        _gameGraph = new Array();
+        _gameGraph.push( g.player );
 
-        _levelGuide[ 10 ] = [ 1 ];   // at level progress of "10", introduce a single "enemy" of type 1.
-        //_levelGuide[ 30 ] = [ 1 ];
+        var last_x = 0;
+        var last_y = 0;
+
+        var next_x = function()
+        {
+            last_x += 32;
+            return last_x;
+        }
+
+        var next_y = function()
+        {
+            last_y = ( last_y === 0 )? 32 : 0;
+            return last_y;
+        }
+
+        for ( var i = 12; i > 0; i-- )
+        { 
+            _gameGraph.push( 
+                    g.gameFactory.newEnemy()
+                    .setPosition( next_x(), next_y() ) );
+        }
+
+        last_x = 0;
+        last_y = 64;
+
+        next_y = function()
+        {
+            last_y = ( last_y === 64 )? 96 : 64;
+            return last_y;
+        }
+
+        for ( var i = 12; i > 0; i-- )
+        { 
+            _gameGraph.push( 
+                    g.gameFactory.newEnemy()
+                    .setPosition( next_x(), next_y() ) ); 
+        }
+               
     }
 
     /* "enum" representing an enemy actor type. */

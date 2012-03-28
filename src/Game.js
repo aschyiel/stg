@@ -38,7 +38,7 @@ g.gameFactory = new GameFactory();
 g.director = new Director();
 g.player = g.gameFactory.getPlayer();
 g.player.setupDefaultGameObject();
-g.director.addToGraph( g.player );
+g.director.addToGraph( g.player );    
 g.canvas = document.getElementById('id_canvas'), 
 g.ctx = g.canvas.getContext('2d'); 
 g.canvas.width = g.width;

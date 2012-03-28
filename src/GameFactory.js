@@ -45,6 +45,9 @@ function GameFactory()
     var MAX_PROJECTILES = 64;
     var PROJECTILE_TYPE_PEW = "Pew";
 
+    /*
+    *   spawn a new basic enemy.
+    */
     this.newEnemy = function( x, y )
     {
         if ( !x )

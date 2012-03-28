@@ -57,15 +57,15 @@ function Enemy( x, y )
         //  correct directional velocity to keep our sprite within our imaginary box.
         //
         if ( this.x - this.width < _left )
-                this.vx = _vx;
+                this.vx = -this.vx;
         else if ( this.x + this.width > _right )
-                this.vx = -( _vx );
+                this.vx = -this.vx;
                
         if ( this.y < _top )
-                this.vy = _vy;
+                this.vy = -this.vy;
 
         if ( this.y > _bottom )
-                this.vy = -( _vy );
+                this.vy = -this.vy;
 
         this.x += this.vx;
         this.y += this.vy;

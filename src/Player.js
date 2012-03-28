@@ -168,7 +168,7 @@ function Player()
 
         if ( _isShooting )
         {
-            that.shoot();
+//          that.shoot();   // TODO
         } 
 
         _gameObject.setPosition( that.x, that.y );
