@@ -20,7 +20,7 @@ var g = {
         gameState: "PLAYING",
 
         /* the current stage in a level in the game. */
-        stage: 0,
+        //stage: 0,
 
         /* the current "level" in the game. */
         level: 0,
@@ -170,11 +170,8 @@ var main = function()
 {
     g.gameState = "PLAYING";
     g.level = 1;
-    g.stage = 1;
 
-    g.director.setLevel( g.level );
-    g.director.setStage( g.stage );
-    g.director.setupLevelStage();
+    g.director.setupLevel();
     doGameLoop();
 }
 

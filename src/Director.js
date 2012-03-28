@@ -16,12 +16,6 @@ function Director()
 
     var _gameGraph = new Array(); 
 
-    /* the current level-stage the director is directing. */ 
-    var _stage = 0;
-
-    /* the current level the director is directing. */
-    var _level = 0;
-
     /* the current level progress.  To be used to figure out what level elements to "introduce" into the set. */
     var _levelProgress = 0; 
 
@@ -166,11 +160,23 @@ function Director()
         return li;
     }
 
-    /* setup our level, initialize our cache of actors, etc... */
-    this.setupLevelStage = function()
+    /* setup our level, initialize our gameGraph with actors, etc... */
+    this.setupLevel = function()
     {
+        if ( !g.level 
+            || 0 === g.level )
+                g.level = 1;
+
         //TODO level factory
-        this.setup_level_one(); 
+        switch ( g.level )
+        {
+            case 1: 
+                this.setup_level_one(); 
+                break; 
+            default:
+                g.gameState = "PAUSED";    // TODO
+                break;
+        } 
     }
 
     /*
@@ -181,6 +187,7 @@ function Director()
     */
     this.setup_level_one = function()
     { 
+        g.level = 1;
         _gameGraph = new Array();
         _gameGraph.push( g.player );
 
@@ -222,32 +229,7 @@ function Director()
                     .setPosition( next_x(), next_y() ) ); 
         }
                
-    }
-
-    /* "enum" representing an enemy actor type. */
-    var ENEMY = 1;
-
-    /* 
-    *   set the level stage.  
-    *   ie. check points.
-    *
-    *   @param stage    (int)
-    */
-    this.setStage = function( stage )
-    {
-        _stage = stage;
-        // TODO:set level progress as appropriately.
-    }
-
-    /* 
-    *   set the level to direct the game for. 
-    *
-    *   @param level    (int)
-    */
-    this.setLevel = function( level )
-    {
-        _level = level;
-    }
+    } 
 
     /*
     *   add a gameObject to the gameGraph.
