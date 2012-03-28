@@ -12,7 +12,7 @@ Enemy.prototype.constructor = Enemy;
 function Enemy( x, y )
 { 
     GameObject.call( this );
-	var that = this; 
+    var that = this; 
     
     that.x = x;
     that.y = y;
@@ -21,17 +21,17 @@ function Enemy( x, y )
     //  public variables.
     // 
 
-	that.image = g.images.enemy; 
+    that.image = g.images.enemy; 
     that.frames = 3; 
-	that.width =    32;
-	that.height =   32;
+    that.width =    32;
+    that.height =   32;
     that.type = "Enemy"; 
 
     //
     //  private variables.
     //
 
-    var _vx = 3;
+    var _vx = 1;
     that.vx = _vx; 
     var _vy = 1;
     that.vy = _vy;
@@ -56,20 +56,19 @@ function Enemy( x, y )
         //
         //  correct directional velocity to keep our sprite within our imaginary box.
         //
-        if ( that.x - that.width < _left )
-                that.vx = _vx;
-        else if ( that.x + that.width > _right )
-                that.vx = -( _vx );
+        if ( this.x - this.width < _left )
+                this.vx = _vx;
+        else if ( this.x + this.width > _right )
+                this.vx = -( _vx );
                
-        //if ( that.y - that.height < _bottom )
-        if ( that.y < _top )
-                that.vy = _vy;
-        //else if ( that.y + that.height > _top )
-        if ( that.y > _bottom )
-                that.vy = -( _vy );
+        if ( this.y < _top )
+                this.vy = _vy;
 
-        that.x += that.vx;
-        that.y += that.vy;
+        if ( this.y > _bottom )
+                this.vy = -( _vy );
+
+        this.x += this.vx;
+        this.y += this.vy;
     } 
 
     //
