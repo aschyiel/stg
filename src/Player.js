@@ -172,7 +172,8 @@ function Player()
         } 
 
         _gameObject.setPosition( that.x, that.y );
-        _gameObject.tick();
+        //_gameObject.tick();   // This causes an issue where the last "enemy" ticks faster.
+                                // Perhaps there is some logical javaScript explanation for this global-variable-ness.
     } 
 
     /*
