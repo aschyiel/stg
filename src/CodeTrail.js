@@ -44,9 +44,15 @@ function CodeTrail( x, y )
 
         var c = "c";
 
+        var prev_y = 0;
+        var next_y = function()
+        {
+            return prev_y += 8;
+        }
+
         var gameCode = new GameCode( x, y );
         that._gameGraph.push( new GameCode()
-                .set_position( x, get_y() )
+                .set_position( x, next_y() )
                 .set_char( c ) 
                 );
     }

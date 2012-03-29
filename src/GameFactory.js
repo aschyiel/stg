@@ -94,7 +94,7 @@ function GameFactory()
             codeTrail.generate_string( lvl );
             
             return codeTrail;
-        }
+        }();
     }
 
     //

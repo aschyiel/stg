@@ -54,12 +54,7 @@ var do_test_loop = function()
 { 
     clear_canvas(); 
 
-    graph.each(function(codeTrail)
-            {
-                codeTrail.tick(); 
-            });
-
-    graph.each(function(codeTrail)
+    graph.forEach(function(codeTrail)
             {
                 codeTrail.draw( g.ctx ); 
             }); 
@@ -67,7 +62,7 @@ var do_test_loop = function()
 	g.gameLoop = setTimeout( doGameLoop, 1000 / 50);    // last!
 }
 
-var setup_code_trails()
+var setup_code_trails = function()
 {
     var n = 1;
     /* return a number representing the code trails "level". */
@@ -93,7 +88,7 @@ var setup_code_trails()
 
     for ( var i=10; i > 0; i-- )
     {
-        graph.push( gameFactory.newCodeTrail( get_n(), get_x(), get_y() ) );
+        graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y() ) );
     }
 }
 
