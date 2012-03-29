@@ -34,7 +34,7 @@ function GameObject( x, y )
 	/* velocity in the y direction. */
     that.vy = 0; 
 
-    /* the tick interval inbetween animation frames. */
+    /* @private, the tick interval inbetween animation frames. */
     that.interval = 0;
 
     /* the maximum tick intervals to wait inbetween switching animation frames. */
@@ -78,9 +78,21 @@ function GameObject( x, y )
     //  public methods.
     //
 
+    //..TODO remove..
     that.setFrames = function( frames )
     {
         that.frames = frames;
+    }
+
+    GameObject.prototype.set_position = function( x, y )
+    {
+        if ( isNaN(x) || isNaN(y) )
+                throw "invalid x,y coords!";
+
+		this.x = x;
+		this.y = y;
+
+		return this; 
     }
 
     that.setPosition = function( x, y )
@@ -123,7 +135,17 @@ function GameObject( x, y )
         {
             //..
 		};
-		
+	
+        manage_frames(); 
+	} 
+
+    /*
+    *   based on our update interval/frequency,
+    *   update the current frame number.
+    *
+    */
+    that.manage_frames = function()
+    {
 		if (that.interval == that.maxInterval ) 
         {
 			if (_currentFrame == that.frames) 
@@ -138,7 +160,7 @@ function GameObject( x, y )
 		}
 
 		that.interval++;		
-	} 
+    }
 
     /*
     *   indicate if this gameObject needs to be removed from the gameGraph.

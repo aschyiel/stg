@@ -76,6 +76,25 @@ function GameFactory()
         var pew = new Pew( x, y );
 
         return pew; 
+    } 
+
+    /*
+    *   generate a new matrix-code-trail representing a level of accomplishment.
+    *
+    *   @param lvl  a number representing the level.
+    *   @param x    the game coordinates for the x-axis.
+    *   @param y    the game coordinates for the y-axis.
+    *   @return CodeTrail 
+    */
+    this.newCodeTrail = function( lvl, x, y )
+    {
+        return function()
+        {
+            var codeTrail = new CodeTrail( x, y );
+            codeTrail.generate_string( lvl );
+            
+            return codeTrail;
+        }
     }
 
     //
