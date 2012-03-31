@@ -40,7 +40,7 @@ g.canvas.width = g.width;
 g.canvas.height = g.height; 
 
 var clear_canvas = function(){
-	g.ctx.fillStyle = '#808080';  /* background colour. */
+	g.ctx.fillStyle = '#202020';  /* background colour. */
 	g.ctx.clearRect(0, 0, g.width, g.height);
 	g.ctx.beginPath();
 	g.ctx.rect(0, 0, g.width, g.height);
@@ -59,8 +59,9 @@ var do_test_loop = function()
                 codeTrail.draw( g.ctx ); 
             }); 
 
-//  g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    // last!
-    g.gameLoop = setTimeout( do_test_loop, 1000 );    // last!
+    g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    // last!
+//  g.gameLoop = setTimeout( do_test_loop, 1000 );    // last!
+//  g.gameLoop = setTimeout( do_test_loop, 100 );    // last!
 }
 
 var setup_code_trails = function()
@@ -75,24 +76,27 @@ var setup_code_trails = function()
     var x = 0;
     var get_x = function()
     {
-        if ( x > g.width )
-                x = n % 32;
-
-        return x += 32;
+        return Math.floor(Math.random()*g.width); //TODO slots..
     }
     var y = 0;
     var get_y = function()
     {
         // TODO sine fxn...
-        return 0;
+        return -10;
     }
 
-//  for ( var i=10; i > 0; i-- )
-//  {
-//      graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y() ) );
-//  }
+    var last_delay = 0;
+    var get_delay = function()
+    {
+        return last_delay += 3;    
+    }
 
-    graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y() ) );
+    for ( var i=256; i > 0; i-- )
+    {
+        graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y(), get_delay() ) );
+    }
+
+//  graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y() ) );
 }
 
 var main = function()

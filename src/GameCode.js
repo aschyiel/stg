@@ -19,8 +19,8 @@ function GameCode( x, y )
     //  public variables.
     // 
 
-    that.frames = 64; 
-    that.maxInterval = 64; 
+    that.frames = 128; 
+    that.maxInterval = 2;   //..gets overridden by set_random_interval..
     that.char;
 
     //
@@ -30,6 +30,12 @@ function GameCode( x, y )
     //
     //  public methods.
     // 
+
+    GameCode.prototype.set_interval = function( interval )
+    {
+        this.maxInterval = interval;
+        return this;
+    }
 
     GameCode.prototype.set_char = function( c )
     {
@@ -47,15 +53,22 @@ function GameCode( x, y )
     that.draw = function()
     { 
         var colour = get_colour(); 
-        if ( !colour )
-                return; //..nothing to draw..
-
         var c = get_char();
-        g.ctx.fillStyle = colour;
-        g.ctx.fillText( c, that.x, that.y ); 
+        if ( colour 
+            && c )
+        { 
+            g.ctx.fillStyle = colour;
+            g.ctx.fillText( c, that.x, that.y ); 
+        }
 
         that.manage_frames();
     } 
+
+    GameCode.prototype.set_delay = function( delay )
+    {
+        this.currentFrame = -delay;
+        return this;
+    }
 
     //
     //  private methods.
@@ -64,41 +77,45 @@ function GameCode( x, y )
     /* return the current character to display. */
     var get_char = function()
     {
-        return that.char;
+        return (that.char)?that.char : "X";
     }
 
     /* return a 2d context fillStyle to represent our gameCode colour. */
     var get_colour = function()
     {
-        var frames = that.currentFrame; 
+        var zFrames = that.currentFrame; 
         var colour = null;
 
-        if ( frames < 0 )
-                return null;
+        if ( zFrames < 0 )
+                return null;    //..allow a delay..
 
         // TODO:optimize this...
-        if ( frames < 8 ) 
+        if ( zFrames < 2 ) 
         {
-            colour = 'white';
+            return "#FFFFFF";
         }
-        else if ( frames > 7 && frames < 16  )
+        else if ( zFrames < 32  )
         { 
-            colour = '0x00FF00';    //..bright green..
+            return "#00FF00"; 
         } 
-        else if ( frames > 15 && frames < 64  )
+        else if ( zFrames < 56  )
         { 
-            colour = '0x00DD00';
+            return "#00DD00"; 
+        }
+        else if ( zFrames < 64  )
+        { 
+            return "#00BB00"; 
         } 
-        else if ( frames > 63 && frames < 128  )
+        else if ( zFrames < 92  )
         { 
-            colour = '0x008800';
-        }
-        else
-        {
-            colour = '0x002200';    //..dim..
-        }
+            return "#007700"; 
+        } 
+        else if ( zFrames < 96  )
+        { 
+            return "#001100";
+        } 
 
-        return colour; 
+        return null; 
     }
 
 }

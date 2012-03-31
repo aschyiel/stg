@@ -86,15 +86,14 @@ function GameFactory()
     *   @param y    the game coordinates for the y-axis.
     *   @return CodeTrail 
     */
-    this.newCodeTrail = function( lvl, x, y )
+    this.newCodeTrail = function( lvl, x, y, delay )
     {
-        return function()
-        {
-            var codeTrail = new CodeTrail( x, y );
-            codeTrail.generate_string( lvl );
-            
-            return codeTrail;
-        }();
+//      return function()
+//      {
+        return new CodeTrail( x, y )
+                .set_delay( delay )
+                .generate_string( lvl );
+//      }();
     }
 
     //

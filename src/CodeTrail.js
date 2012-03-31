@@ -19,6 +19,7 @@ function CodeTrail( x, y )
     that.x = x;
     that.y = y;
     that.type = "CodeTrail";
+    that.delay = 0;
 
     that._gameGraph = new Array();
 
@@ -28,6 +29,12 @@ function CodeTrail( x, y )
     */
 
     that.chars = new Array();
+
+    that.set_delay = function( delay )
+    {
+        that.delay = delay;
+        return this;
+    }
 
     /*
     *   generate a code string based off the current level.
@@ -44,12 +51,14 @@ function CodeTrail( x, y )
 
         var idx = 0; 
         var char_set_max_index = charSet.length - 1;
-        for ( var i = 1; i < 32; i++ )  
+        for ( var i = 1; i < 64; i++ )  
         {
             idx = i * n;            
             if ( idx > char_set_max_index )
                     idx = idx - char_set_max_index; //..wraps, this implies a max level..
                                                     //..of about 150 or so...
+            if ( idx < 0 )
+                    idx = 0;
 
             chars.push( charSet[ idx ] );
         } 
@@ -59,6 +68,14 @@ function CodeTrail( x, y )
         {
             return prev_y += 8;
         }
+        
+        var prev_delay = that.delay;
+        var next_delay = function()
+        {
+            return prev_delay += 2;
+        }
+
+        var random_interval = 1 + Math.floor( Math.random() * 4 );  //..tops out at 5..
 
         chars.forEach( function(c)
         {
@@ -66,9 +83,12 @@ function CodeTrail( x, y )
             that._gameGraph.push( new GameCode()
                     .set_position( x, next_y() )
                     .set_char( c ) 
+                    .set_delay( next_delay() )
+                    .set_interval( random_interval )
                     ); 
         }); 
-        that.chars = chars;
+        that.chars = chars; 
+        return that;
     } 
 
     /*
@@ -83,7 +103,7 @@ function CodeTrail( x, y )
     *
     *   TODO:shuffle these.
     */
-    that.charSet = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+    CodeTrail.prototype.charSet = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
             ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", 
             "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", 
             "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", 
