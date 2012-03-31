@@ -43,17 +43,16 @@ function GameCode( x, y )
         return this;
     }
 
-//  GameCode.prototype.tick = function()
-    that.tick = function()
+    GameCode.prototype.tick = function()
     {
         //..do nothing (don't move!)..
     }
+    that.tick = GameCode.prototype.draw;
 
-//  GameCode.prototype.draw = function()
-    that.draw = function()
+    GameCode.prototype.draw = function()
     { 
-        var colour = get_colour(); 
-        var c = get_char();
+        var colour = this.get_colour(); 
+        var c = this.get_char();
         if ( colour 
             && c )
         { 
@@ -61,8 +60,9 @@ function GameCode( x, y )
             g.ctx.fillText( c, that.x, that.y ); 
         }
 
-        that.manage_frames();
+        this.manage_frames();
     } 
+    that.draw = GameCode.prototype.draw;
 
     GameCode.prototype.set_delay = function( delay )
     {
@@ -75,16 +75,15 @@ function GameCode( x, y )
     // 
  
     /* return the current character to display. */
-    var get_char = function()
+    GameCode.prototype.get_char = function()
     {
-        return (that.char)?that.char : "X";
+        return (this.char)?this.char : "X";
     }
 
     /* return a 2d context fillStyle to represent our gameCode colour. */
-    var get_colour = function()
+    GameCode.prototype.get_colour = function()
     {
-        var zFrames = that.currentFrame; 
-        var colour = null;
+        var zFrames = this.currentFrame; 
 
         if ( zFrames < 0 )
                 return null;    //..allow a delay..
