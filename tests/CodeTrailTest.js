@@ -59,7 +59,8 @@ var do_test_loop = function()
                 codeTrail.draw( g.ctx ); 
             }); 
 
-	g.gameLoop = setTimeout( doGameLoop, 1000 / 50);    // last!
+//  g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    // last!
+    g.gameLoop = setTimeout( do_test_loop, 1000 );    // last!
 }
 
 var setup_code_trails = function()
@@ -86,10 +87,12 @@ var setup_code_trails = function()
         return 0;
     }
 
-    for ( var i=10; i > 0; i-- )
-    {
-        graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y() ) );
-    }
+//  for ( var i=10; i > 0; i-- )
+//  {
+//      graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y() ) );
+//  }
+
+    graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y() ) );
 }
 
 var main = function()

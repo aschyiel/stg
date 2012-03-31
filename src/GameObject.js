@@ -48,7 +48,7 @@ function GameObject( x, y )
     //
 
     /* the current animation frame. */
-    var _currentFrame = 0;
+    that.currentFrame = 0;
 
     /* is this gameObject disabled.  Is it to be sequestored inbetween respawn. */
     var _disabled = false;
@@ -127,7 +127,7 @@ function GameObject( x, y )
 
 		try 
         { 
-            ctx.drawImage( that.image, 0, that.height * _currentFrame, 
+            ctx.drawImage( that.image, 0, that.height * that.currentFrame, 
                     that.width, that.height, that.x, 
                     that.y, that.width, that.height );
 		} 
@@ -136,7 +136,7 @@ function GameObject( x, y )
             //..
 		};
 	
-        manage_frames(); 
+        that.manage_frames(); 
 	} 
 
     /*
@@ -148,13 +148,13 @@ function GameObject( x, y )
     {
 		if (that.interval == that.maxInterval ) 
         {
-			if (_currentFrame == that.frames) 
+			if (that.currentFrame == that.frames) 
             {
-				_currentFrame = 0; 
+				that.currentFrame = 0; 
 			}
 			else 
             {
-				_currentFrame++;
+				that.currentFrame++;
 			}
 			that.interval = 0;
 		}

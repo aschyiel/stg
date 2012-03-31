@@ -37,12 +37,14 @@ function GameCode( x, y )
         return this;
     }
 
-    GameCode.prototype.tick = function()
+//  GameCode.prototype.tick = function()
+    that.tick = function()
     {
         //..do nothing (don't move!)..
     }
 
-    GameCode.prototype.draw = function()
+//  GameCode.prototype.draw = function()
+    that.draw = function()
     { 
         var colour = get_colour(); 
         if ( !colour )
@@ -50,7 +52,7 @@ function GameCode( x, y )
 
         var c = get_char();
         g.ctx.fillStyle = colour;
-        g.ctx.fillText( c, x, y ); 
+        g.ctx.fillText( c, that.x, that.y ); 
 
         that.manage_frames();
     } 
