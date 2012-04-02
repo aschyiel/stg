@@ -12,8 +12,8 @@ var g = {
         canvas: null,
         ctx: null, 
         gameLoop: null,
-        width: 768,
-        height: 448, 
+        width:  400,
+        height: 300, 
 
         /* the global game state. */
         gameState: "PLAYING",
@@ -59,9 +59,8 @@ var do_test_loop = function()
                 codeTrail.draw( g.ctx ); 
             }); 
 
-    g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    // last!
-//  g.gameLoop = setTimeout( do_test_loop, 1000 );    // last!
-//  g.gameLoop = setTimeout( do_test_loop, 100 );    // last!
+    g.gameLoop = setTimeout( do_test_loop, 5 );    // last!
+//  g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    // last!
 }
 
 var setup_code_trails = function()
@@ -91,17 +90,51 @@ var setup_code_trails = function()
         return last_delay += 3;    
     }
 
-    for ( var i=256; i > 0; i-- )
+    //  20 msec gameloop timeout
+    //
+    //  400x300
+    //  64 --- 8 fps
+    //  32 --- 14 fps
+    //  16 --- 22 fps
+    //
+    //  768x448
+    //  64 --- 8 fps, 120 msec update frequency.
+    //  32 --- 13~14 fps, 72~80 msec
+    //  16 --- 20 fps, 50 msec
+    //  8  --- 27 fps, 37 msec
+    //
+
+    //  5 msec gameloop timeout
+    //
+    //  400x300
+    // 256 --- 4 fps
+    //  64 --- 8 fps
+    //  32 ---    fps
+    //  16 --- 23 fps
+    //
+    //  768x448
+    //  64 --- 
+    //  32 --- 
+    //  16 --- 
+    //  8  --- 
+    //
+
+
+
+//  for ( var i=256; i > 0; i-- )
+    for ( var i=64; i > 0; i-- )
+//  for ( var i=32; i > 0; i-- )
+//  for ( var i=16; i > 0; i-- )
+//  for ( var i=8; i > 0; i-- )
     {
         graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y(), get_delay() ) );
-    }
-
-//  graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y() ) );
+    } 
 }
 
 var main = function()
 {
     setup_code_trails(); 
+    graph.push( new Stats() );
 
     do_test_loop();
 }

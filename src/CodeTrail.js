@@ -60,6 +60,10 @@ function CodeTrail( x, y )
             if ( idx < 0 )
                     idx = 0;
 
+            if ( null === charSet[idx] )
+            { 
+                idx = 0;
+            } 
             chars.push( charSet[ idx ] );
         } 
 
