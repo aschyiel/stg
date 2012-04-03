@@ -26,7 +26,7 @@ var g = {
         level: 0,
 
         /* show status via labels such as game progress. */
-        showStats: true
+        showStats: true 
 
         };
 
@@ -45,6 +45,7 @@ g.canvas.width = g.width;
 g.canvas.height = g.height; 
 g.player.setPosition(~~((g.width - g.player.width)/2), ~~((g.height - g.player.height)/2)); 
 g.verticalCenter = ~~( g.height / 2 );
+g.stats = new Stats();
 
 //
 //  cache image resources.
@@ -145,6 +146,8 @@ var togglePause = function()
     g.gameState = ( g.gameState == "PAUSED" )? "PLAYING" : "PAUSED";
 }
 
+var stats = g.stats;
+
 var doGameLoop = function(){
 
 
@@ -153,6 +156,7 @@ var doGameLoop = function(){
         clear_canvas(); 
         g.director.direct(); 
         g.director.draw( g.ctx );
+        stats.draw();
     }
     else if ( "PAUSED" == g.gameState )
     {
