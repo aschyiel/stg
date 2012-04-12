@@ -46,9 +46,9 @@ var clear_canvas = function(){
 	g.ctx.rect(0, 0, g.width, g.height);
 	g.ctx.closePath();
 	g.ctx.fill();
-} 
+}; 
 
-var graph = new Array();
+var graph = [];
 
 var do_test_loop = function()
 { 
@@ -62,7 +62,7 @@ var do_test_loop = function()
 //  g.gameLoop = setTimeout( do_test_loop, 5 );    // last!
     g.gameLoop = setTimeout( do_test_loop, 15 );    // last!
 //  g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    // last!
-}
+};
 
 var setup_code_trails = function()
 {
@@ -71,25 +71,25 @@ var setup_code_trails = function()
     var get_n = function()
     {
         return n++; 
-    }
+    };
 
     var x = 0;
     var get_x = function()
     {
         return Math.floor(Math.random()*g.width); //TODO slots..
-    }
+    };
     var y = 0;
     var get_y = function()
     {
         // TODO sine fxn...
         return -10;
-    }
+    };
 
     var last_delay = 0;
     var get_delay = function()
     {
         return last_delay += 3;    
-    }
+    };
 
     //  20 msec gameloop timeout
     //
@@ -130,7 +130,7 @@ var setup_code_trails = function()
     {
         graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y(), get_delay() ) );
     } 
-}
+};
 
 var main = function()
 {
@@ -138,6 +138,6 @@ var main = function()
     graph.push( new Stats() );
 
     do_test_loop();
-}
+};
 
 main();
