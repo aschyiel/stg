@@ -12,8 +12,8 @@ var g = {
         canvas: null,
         ctx: null, 
         gameLoop: null,
-        width:  400,
-        height: 300, 
+        width:  800,
+        height: 600, 
 
         /* the global game state. */
         gameState: "PLAYING",
@@ -59,7 +59,8 @@ var do_test_loop = function()
                 codeTrail.draw( g.ctx ); 
             }); 
 
-    g.gameLoop = setTimeout( do_test_loop, 5 );    // last!
+//  g.gameLoop = setTimeout( do_test_loop, 5 );    // last!
+    g.gameLoop = setTimeout( do_test_loop, 15 );    // last!
 //  g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    // last!
 };
 
@@ -121,8 +122,8 @@ var setup_code_trails = function()
 
 
 
-//  for ( var i=256; i > 0; i-- )
-    for ( var i=64; i > 0; i-- )
+    for ( var i=256; i > 0; i-- )
+//  for ( var i=64; i > 0; i-- )
 //  for ( var i=32; i > 0; i-- )
 //  for ( var i=16; i > 0; i-- )
 //  for ( var i=8; i > 0; i-- )
