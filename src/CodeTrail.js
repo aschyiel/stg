@@ -46,40 +46,31 @@ function CodeTrail( x, y )
     */
     that.generate_string = function( n )
     {
-        var chars = new Array();
-        var charSet = that.charSet;
+        var chars = [],
+            charSet = that.charSet,
+            idx = 0,
+            char_set_max_index = charSet.length - 1,
+            i = 1,
+            prev_y = 0,
+            prev_delay = that.delay, 
+            code_trail_length = 64,
+            random_interval = 1 + Math.floor( Math.random() * 4 );  //..tops out at 5..  
 
-        var idx = 0; 
-        var char_set_max_index = charSet.length - 1;
-        for ( var i = 1; i < 64; i++ )  
+        for ( ; i < code_trail_length; i++ )
         {
-            idx = i * n;            
-            if ( idx > char_set_max_index )
-                    idx = idx - char_set_max_index; //..wraps, this implies a max level..
-                                                    //..of about 150 or so...
-            if ( idx < 0 )
-                    idx = 0;
-
-            if ( null === charSet[idx] )
-            { 
-                idx = 0;
-            } 
+            idx = Math.floor( Math.random() * char_set_max_index );
             chars.push( charSet[ idx ] );
         } 
 
-        var prev_y = 0;
         var next_y = function()
         {
             return prev_y += 8;
         }
         
-        var prev_delay = that.delay;
         var next_delay = function()
         {
             return prev_delay += 2;
-        }
-
-        var random_interval = 1 + Math.floor( Math.random() * 4 );  //..tops out at 5..
+        } 
 
         chars.forEach( function(c)
         {
