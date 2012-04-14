@@ -11,6 +11,96 @@
 */
 CodeTrail.prototype = new GameObject();
 CodeTrail.prototype.constructor = CodeTrail;
+
+/*
+*   the keyboard character set,
+*   generated in ruby.
+*   irb(main):009:0> ('0'..'z').collect{ |it| it }
+*
+*   groovy:000> (0xa0..0xff).collect{ "\"\\u30${it.toHexString(it)}\"" }
+*   The unicode katakana set (30a0..30ff).
+*
+*   length 75 + 96 = 171 .
+*
+*   TODO:shuffle these.
+*/
+CodeTrail.prototype.charSet = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
+        ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", 
+        "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", 
+        "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", 
+        "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", 
+        "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", 
+        "v", "w", "x", "y", "z",
+        "\u30a0", "\u30a1", "\u30a2", "\u30a3", "\u30a4", 
+        "\u30a5", "\u30a6", "\u30a7", "\u30a8", "\u30a9", "\u30aa", 
+        "\u30ab", "\u30ac", "\u30ad", "\u30ae", "\u30af", "\u30b0", 
+        "\u30b1", "\u30b2", "\u30b3", "\u30b4", "\u30b5", "\u30b6", 
+        "\u30b7", "\u30b8", "\u30b9", "\u30ba", "\u30bb", "\u30bc", 
+        "\u30bd", "\u30be", "\u30bf", "\u30c0", "\u30c1", "\u30c2", 
+        "\u30c3", "\u30c4", "\u30c5", "\u30c6", "\u30c7", "\u30c8", 
+        "\u30c9", "\u30ca", "\u30cb", "\u30cc", "\u30cd", "\u30ce", 
+        "\u30cf", "\u30d0", "\u30d1", "\u30d2", "\u30d3", "\u30d4", 
+        "\u30d5", "\u30d6", "\u30d7", "\u30d8", "\u30d9", "\u30da", 
+        "\u30db", "\u30dc", "\u30dd", "\u30de", "\u30df", "\u30e0", 
+        "\u30e1", "\u30e2", "\u30e3", "\u30e4", "\u30e5", "\u30e6", 
+        "\u30e7", "\u30e8", "\u30e9", "\u30ea", "\u30eb", "\u30ec", 
+        "\u30ed", "\u30ee", "\u30ef", "\u30f0", "\u30f1", "\u30f2", 
+        "\u30f3", "\u30f4", "\u30f5", "\u30f6", "\u30f7", "\u30f8", 
+        "\u30f9", "\u30fa", "\u30fb", "\u30fc", "\u30fd", "\u30fe", 
+        "\u30ff" ]; 
+
+CodeTrail.prototype.colours = [ 
+        "#FFFFFF",  /* white */
+        "#00FF00",  /* greenest */
+        "#00DD00",
+        "#00BB00",  /* faded green. */
+        "#007700",
+        "#001100"   /* almost black-green. */
+        ];
+
+/*
+*   the character image/canvas set for each codeTrail character
+*
+*   key: character,
+*   value: another object with colour to canvas key pairs.
+*/
+CodeTrail.prototype.charImageSet = (function()
+{
+    var charSet = CodeTrail.prototype.charSet,
+            charImageSet = {},
+            canvas,
+            colours = CodeTrail.prototype.colours,
+            c,
+            images,
+            height = 12,
+            width = 12,
+            ctx;
+
+    var cache_char_images = function( c )
+            {
+                images = {};
+
+                colours.forEach( function( colour )
+                {
+                    canvas = document.createElement( 'canvas' );
+                    canvas.height = height;
+                    canvas.width = width; 
+                    ctx = canvas.getContext( '2d' );
+                    ctx.fillStyle = colour;
+                    ctx.fillText( c, 0, 0 );
+
+                    images[ colour ] = canvas;
+                }); 
+
+                charImageSet[ c ] = images;
+            };
+    
+    charSet.forEach( 
+            function( c ) { cache_char_images( c ) } ); 
+
+    return charImageSet;
+})();
+
 function CodeTrail( x, y )
 { 
     GameObject.call( this );
@@ -21,14 +111,14 @@ function CodeTrail( x, y )
     that.type = "CodeTrail";
     that.delay = 0;
 
-    that._gameGraph = new Array();
+    that._gameGraph = [];
 
     /* 
     *   the string represented as an array of characters.
     *   needed for reference by wild-card-gameCodes...
     */
 
-    that.chars = new Array();
+    that.chars = [];
 
     that.set_delay = function( delay )
     {
@@ -85,43 +175,6 @@ function CodeTrail( x, y )
         that.chars = chars; 
         return that;
     } 
-
-    /*
-    *   the keyboard character set,
-    *   generated in ruby.
-    *   irb(main):009:0> ('0'..'z').collect{ |it| it }
-    *
-    *   groovy:000> (0xa0..0xff).collect{ "\"\\u30${it.toHexString(it)}\"" }
-    *   The unicode katakana set (30a0..30ff).
-    *
-    *   length 75 + 96 = 171 .
-    *
-    *   TODO:shuffle these.
-    */
-    CodeTrail.prototype.charSet = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", 
-            ":", ";", "<", "=", ">", "?", "@", "A", "B", "C", "D", "E", 
-            "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", 
-            "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\", "]", 
-            "^", "_", "`", "a", "b", "c", "d", "e", "f", "g", "h", "i", 
-            "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", 
-            "v", "w", "x", "y", "z",
-            "\u30a0", "\u30a1", "\u30a2", "\u30a3", "\u30a4", 
-            "\u30a5", "\u30a6", "\u30a7", "\u30a8", "\u30a9", "\u30aa", 
-            "\u30ab", "\u30ac", "\u30ad", "\u30ae", "\u30af", "\u30b0", 
-            "\u30b1", "\u30b2", "\u30b3", "\u30b4", "\u30b5", "\u30b6", 
-            "\u30b7", "\u30b8", "\u30b9", "\u30ba", "\u30bb", "\u30bc", 
-            "\u30bd", "\u30be", "\u30bf", "\u30c0", "\u30c1", "\u30c2", 
-            "\u30c3", "\u30c4", "\u30c5", "\u30c6", "\u30c7", "\u30c8", 
-            "\u30c9", "\u30ca", "\u30cb", "\u30cc", "\u30cd", "\u30ce", 
-            "\u30cf", "\u30d0", "\u30d1", "\u30d2", "\u30d3", "\u30d4", 
-            "\u30d5", "\u30d6", "\u30d7", "\u30d8", "\u30d9", "\u30da", 
-            "\u30db", "\u30dc", "\u30dd", "\u30de", "\u30df", "\u30e0", 
-            "\u30e1", "\u30e2", "\u30e3", "\u30e4", "\u30e5", "\u30e6", 
-            "\u30e7", "\u30e8", "\u30e9", "\u30ea", "\u30eb", "\u30ec", 
-            "\u30ed", "\u30ee", "\u30ef", "\u30f0", "\u30f1", "\u30f2", 
-            "\u30f3", "\u30f4", "\u30f5", "\u30f6", "\u30f7", "\u30f8", 
-            "\u30f9", "\u30fa", "\u30fb", "\u30fc", "\u30fd", "\u30fe", 
-            "\u30ff" ]; 
 
     that.tick = function()
     {
