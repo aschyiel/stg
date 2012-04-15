@@ -23,7 +23,7 @@ function Stats()
         var now = Date.now();
         var msec = now - that.last; 
         var fps = ~~(1000 / msec);
-        var avg_fps = ~~( that.frames / ( now - that.first ) );
+//      var avg_fps = ~~( that.frames / ( now - that.first ) );
 
         that.last = now; 
 
@@ -35,16 +35,19 @@ function Stats()
         }
 
         g.ctx.fillStyle = 'yellow';
-        g.ctx.fillText( "effective FPS:"+fps,
+        g.ctx.fillText( "FPS:"+fps,
                 that.x, get_y() );
 
-        g.ctx.fillText( "average FPS:"+avg_fps,
-                that.x, get_y() );
+        //
+        //  TODO:fillText is slow!!!
+        //
+//      g.ctx.fillText( "average FPS:"+avg_fps,
+//              that.x, get_y() );
 
-        g.ctx.fillText( "total frames:"+that.frames,
-                that.x, get_y() ); 
-        g.ctx.fillText( "update frequency (msec):"+msec,
-                that.x, get_y() ); 
+//      g.ctx.fillText( "total frames:"+that.frames,
+//              that.x, get_y() ); 
+//      g.ctx.fillText( "update frequency (msec):"+msec,
+//              that.x, get_y() ); 
 
     } 
 }
