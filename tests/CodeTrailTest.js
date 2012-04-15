@@ -122,11 +122,11 @@ var setup_code_trails = function()
 
 
 
-    for ( var i=256; i > 0; i-- )
+//  for ( var i=256; i > 0; i-- )
 //  for ( var i=64; i > 0; i-- )
 //  for ( var i=32; i > 0; i-- )
 //  for ( var i=16; i > 0; i-- )
-//  for ( var i=8; i > 0; i-- )
+    for ( var i=8; i > 0; i-- )
     {
         graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y(), get_delay() ) );
     } 

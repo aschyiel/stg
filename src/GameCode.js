@@ -21,7 +21,7 @@ function GameCode( x, y )
 
     that.frames = 128; 
     that.maxInterval = 2;   //..gets overridden by set_random_interval..
-    that.char;
+    that.char_images;  /* a single item from CodeTrail's charImageSet. */ 
 
     //
     //  private variables.
@@ -37,9 +37,9 @@ function GameCode( x, y )
         return this;
     }
 
-    GameCode.prototype.set_char = function( c )
+    GameCode.prototype.set_char_images = function( char_images )
     {
-        this.char = c;
+        this.char_images = char_images;
         return this;
     }
 
@@ -47,18 +47,17 @@ function GameCode( x, y )
     {
         //..do nothing (don't move!)..
     }
-    that.tick = GameCode.prototype.draw;
+    that.tick = GameCode.prototype.draw;    // TODO:bug?
 
     GameCode.prototype.draw = function()
     { 
-        var colour = this.get_colour(); 
-        var c = this.get_char();
-        if ( colour 
-            && c )
-        { 
-            g.ctx.fillStyle = colour;
-            g.ctx.fillText( c, that.x, that.y ); 
-        }
+        var colour = this.get_colour(), 
+                char_images = this.get_char_images(),
+                image;
+
+        image = char_images[ colour ];  // TODO:this assumes 1 char only.  
+        if ( image )
+                g.ctx.drawImage( image, that.x, that.y ); 
 
         this.manage_frames();
     } 
@@ -75,15 +74,16 @@ function GameCode( x, y )
     // 
  
     /* return the current character to display. */
-    GameCode.prototype.get_char = function()
+    GameCode.prototype.get_char_images = function()
     {
-        return (this.char)?this.char : "X";
+        return this.char_images;
     }
 
     /* return a 2d context fillStyle to represent our gameCode colour. */
     GameCode.prototype.get_colour = function()
     {
-        var zFrames = this.currentFrame; 
+        var zFrames = this.currentFrame,
+                colours = CodeTrail.prototype.colours; 
 
         if ( zFrames < 0 )
                 return null;    //..allow a delay..
@@ -91,27 +91,27 @@ function GameCode( x, y )
         // TODO:optimize this...
         if ( zFrames < 2 ) 
         {
-            return "#FFFFFF";
+            return colours[0];
         }
         else if ( zFrames < 32  )
         { 
-            return "#00FF00"; 
+            return colours[1]; 
         } 
         else if ( zFrames < 56  )
         { 
-            return "#00DD00"; 
+            return colours[2]; 
         }
         else if ( zFrames < 64  )
         { 
-            return "#00BB00"; 
+            return colours[3]; 
         } 
         else if ( zFrames < 92  )
         { 
-            return "#007700"; 
+            return colours[4]; 
         } 
         else if ( zFrames < 96  )
         { 
-            return "#001100";
+            return colours[5];
         } 
 
         return null; 

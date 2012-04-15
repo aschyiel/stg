@@ -49,6 +49,12 @@ CodeTrail.prototype.charSet = [ "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
         "\u30f9", "\u30fa", "\u30fb", "\u30fc", "\u30fd", "\u30fe", 
         "\u30ff" ]; 
 
+// TODO:uppercase to signify pseudo-enum-ness?
+/*
+*   the different character colours we can draw.
+*   warning, GameCode.js expect at least 6 values here...
+*
+*/
 CodeTrail.prototype.colours = [ 
         "#FFFFFF",  /* white */
         "#00FF00",  /* greenest */
@@ -72,8 +78,7 @@ CodeTrail.prototype.charImageSet = (function()
             colours = CodeTrail.prototype.colours,
             c,
             images,
-            height = 12,
-            width = 12,
+            maxWidth = width = height = 12,
             ctx;
 
     var cache_char_images = function( c )
@@ -87,7 +92,7 @@ CodeTrail.prototype.charImageSet = (function()
                     canvas.width = width; 
                     ctx = canvas.getContext( '2d' );
                     ctx.fillStyle = colour;
-                    ctx.fillText( c, 0, 0 );
+                    ctx.fillText( c, 0, height, maxWidth );
 
                     images[ colour ] = canvas;
                 }); 
@@ -144,6 +149,7 @@ function CodeTrail( x, y )
             prev_y = 0,
             prev_delay = that.delay, 
             code_trail_length = 64,
+            charImageSet = CodeTrail.prototype.charImageSet,
             random_interval = 1 + Math.floor( Math.random() * 4 );  //..tops out at 5..  
 
         for ( ; i < code_trail_length; i++ )
@@ -167,7 +173,7 @@ function CodeTrail( x, y )
             var gameCode = new GameCode( 0, 0 );
             that._gameGraph.push( new GameCode()
                     .set_position( x, next_y() )
-                    .set_char( c ) 
+                    .set_char_images( charImageSet[ c ] ) 
                     .set_delay( next_delay() )
                     .set_interval( random_interval )
                     ); 
