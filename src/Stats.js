@@ -34,7 +34,7 @@ function Stats()
             return y;
         }
 
-        g.ctx.fillStype = 'yellow';
+        g.ctx.fillStyle = 'yellow';
         g.ctx.fillText( "effective FPS:"+fps,
                 that.x, get_y() );
 
