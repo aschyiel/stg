@@ -78,7 +78,6 @@ function GameObject( x, y )
     //  public methods.
     //
 
-    //..TODO remove..
     that.setFrames = function( frames )
     {
         that.frames = frames;

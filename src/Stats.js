@@ -16,37 +16,50 @@ function Stats()
 
     that.frames = 0; 
 
+    that.height = 12;
+    that.width = 36;
+
+    that.canvas = document.createElement( 'canvas' );
+    that.canvas.height = that.height;
+    that.canvas.width = that.width;
+    that.ctx = that.canvas.getContext( '2d' ); 
+//  that.ctx.fillStyle = 'yellow';
+
     /* GameObject pseudo-interface "draw". */
     that.draw = function()
     {
+        var x = that.x,
+                y = that.y,
+                h = that.height,
+                w = that.width,
+                ctx = that.ctx,
+                img = that.canvas;
+
         that.frames++;
         var now = Date.now();
         var msec = now - that.last; 
         var fps = ~~(1000 / msec);
-//      var avg_fps = ~~( that.frames / ( now - that.first ) );
 
         that.last = now; 
 
-        var y = that.y;
-        var get_y = function()
-        {
-            y -= 12;
-            return y;
-        }
 
-        g.ctx.fillStyle = 'yellow';
-        g.ctx.fillText( "FPS:"+fps,
-                that.x, get_y() );
+//      g.ctx.clearRect( x, y, w, h );
+        ctx.clearRect( 0, 0, w, h );
+
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.rect( 0, 0, w, h );
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = 'yellow';
+        ctx.fillText( "FPS:"+fps, 0, h );   
+        g.ctx.drawImage( img, x, y ); 
 
         //
         //  TODO:fillText is slow!!!
         //
-//      g.ctx.fillText( "average FPS:"+avg_fps,
-//              that.x, get_y() );
-
 //      g.ctx.fillText( "total frames:"+that.frames,
-//              that.x, get_y() ); 
-//      g.ctx.fillText( "update frequency (msec):"+msec,
 //              that.x, get_y() ); 
 
     } 

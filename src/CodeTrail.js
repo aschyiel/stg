@@ -78,7 +78,7 @@ CodeTrail.prototype.charImageSet = (function()
             colours = CodeTrail.prototype.colours,
             c,
             images,
-            maxWidth = width = height = 12,
+            maxWidth = width = height = 12, /* TODO:set to GameCode.prototype.width */
             ctx;
 
     var cache_char_images = function( c )
@@ -189,10 +189,12 @@ function CodeTrail( x, y )
 
     that.draw = function()
     {
+//console.profile();
         that._gameGraph.forEach( function( gameCode )
         { 
             gameCode.draw();
         });
+//console.profileEnd();
     } 
 }
 

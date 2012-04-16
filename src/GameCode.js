@@ -6,6 +6,7 @@
 */
 GameCode.prototype = new GameObject();
 GameCode.prototype.constructor = GameCode; 
+GameCode.prototype.width = 12;
 function GameCode( x, y )
 { 
     GameObject.call( this );
@@ -14,6 +15,9 @@ function GameCode( x, y )
     that.x = x;
     that.y = y;
     that.type = "GameCode";
+
+    // TODO:unhardcode and have it set by CodeTrail.
+    that.width = that.height = GameCode.prototype.width;
 
     //
     //  public variables.
@@ -49,15 +53,40 @@ function GameCode( x, y )
     }
     that.tick = GameCode.prototype.draw;    // TODO:bug?
 
+    that.prev_colour;
+
     GameCode.prototype.draw = function()
     { 
-        var colour = this.get_colour(), 
+        var colour = this.get_colour(),
+                prev_colour = this.prev_colour,
                 char_images = this.get_char_images(),
-                image;
+                image, 
+                ctx = g.bg_ctx,
+                x = this.x,
+                y = this.y,
+                h = this.height,
+                w = this.width; 
 
-        image = char_images[ colour ];  // TODO:this assumes 1 char only.  
-        if ( image )
-                g.ctx.drawImage( image, that.x, that.y ); 
+        if ( colour !== prev_colour  )
+        {
+            image = char_images[ colour ];  // TODO:this assumes 1 char only.  
+
+            if ( image )
+            {
+                ctx.drawImage( image, x, y ); 
+            }
+            else
+            {
+                ctx.fillStyle = '#000000'; 
+                ctx.clearRect( x, y, w, h ); 
+                ctx.beginPath();
+                ctx.rect(x, y, w, h);
+                ctx.closePath();
+                ctx.fill(); 
+            }
+
+            this.prev_colour = colour;
+        }
 
         this.manage_frames();
     } 
@@ -67,7 +96,7 @@ function GameCode( x, y )
     {
         this.currentFrame = -delay;
         return this;
-    }
+    } 
 
     //
     //  private methods.

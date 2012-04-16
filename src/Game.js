@@ -41,6 +41,8 @@ g.player.setupDefaultGameObject();
 g.director.addToGraph( g.player );    
 g.canvas = document.getElementById('id_canvas'), 
 g.ctx = g.canvas.getContext('2d'); 
+g.bg_canvas = document.getElementById('id_bg_canvas'), 
+g.bg_ctx = g.bg_canvas.getContext('2d'); 
 g.canvas.width = g.width;
 g.canvas.height = g.height; 
 g.player.setPosition(~~((g.width - g.player.width)/2), ~~((g.height - g.player.height)/2)); 

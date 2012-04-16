@@ -33,35 +33,62 @@ var g = {
 //  further global variable initialization(s).
 //
 
+g.busy = false;
 g.gameFactory = new GameFactory();
-g.canvas = document.getElementById('id_canvas'), 
+g.canvas = document.getElementById('id_fg_canvas'); 
+
 g.ctx = g.canvas.getContext('2d'); 
-g.canvas.width = g.width;
+
+g.canvas.width =  g.width;
 g.canvas.height = g.height; 
 
+g.bg_canvas = document.createElement( 'canvas' );
+g.bg_canvas.width = g.width;
+g.bg_canvas.height = g.height;
+g.bg_ctx = g.bg_canvas.getContext( '2d' );
+
+var _bg_canvas = document.getElementById('id_bg_canvas');
+_bg_canvas.width = g.width;
+_bg_canvas.height = g.height;
+var _bg_ctx = _bg_canvas.getContext('2d');
+
 var clear_canvas = function(){
-	g.ctx.fillStyle = '#202020';  /* background colour. */
-	g.ctx.clearRect(0, 0, g.width, g.height);
-	g.ctx.beginPath();
-	g.ctx.rect(0, 0, g.width, g.height);
-	g.ctx.closePath();
-	g.ctx.fill();
+//  g.ctx.fillStyle = '#202020';  /* background colour. */
+    g.ctx.clearRect(0, 0, g.width, g.height);
+//  g.ctx.beginPath();
+//  g.ctx.rect(0, 0, g.width, g.height);
+//  g.ctx.closePath();
+//  g.ctx.fill();
 }; 
 
 var graph = [];
 
 var do_test_loop = function()
 { 
+//console.profile();
+//  if ( g.busy )
+//  { 
+//      g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    
+//  }
+
+    if ( g.busy )
+            return;
+
+    g.busy = true;
+
     clear_canvas(); 
 
     graph.forEach(function(codeTrail)
             {
-                codeTrail.draw( g.ctx ); 
+                codeTrail.draw(); 
             }); 
 
-//  g.gameLoop = setTimeout( do_test_loop, 5 );    // last!
-    g.gameLoop = setTimeout( do_test_loop, 15 );    // last!
-//  g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    // last!
+    _bg_ctx.drawImage( g.bg_canvas, 0, 0 ); 
+
+//  g.gameLoop = setTimeout( do_test_loop, 1000 / 50);    
+    g.gameLoop = setTimeout( do_test_loop, 20 );    
+    g.busy = false;
+//console.profileEnd();
 };
 
 var setup_code_trails = function()
@@ -93,11 +120,6 @@ var setup_code_trails = function()
 
     //  20 msec gameloop timeout
     //
-    //  400x300
-    //  64 --- 8 fps
-    //  32 --- 14 fps
-    //  16 --- 22 fps
-    //
     //  768x448
     //  64 --- 8 fps, 120 msec update frequency.
     //  32 --- 13~14 fps, 72~80 msec
@@ -105,28 +127,13 @@ var setup_code_trails = function()
     //  8  --- 27 fps, 37 msec
     //
 
-    //  5 msec gameloop timeout
-    //
-    //  400x300
-    // 256 --- 4 fps
-    //  64 --- 8 fps
-    //  32 ---    fps
-    //  16 --- 23 fps
-    //
-    //  768x448
-    //  64 --- 
-    //  32 --- 
-    //  16 --- 
-    //  8  --- 
-    //
-
-
 
 //  for ( var i=256; i > 0; i-- )
-//  for ( var i=64; i > 0; i-- )
+    for ( var i=64; i > 0; i-- )
 //  for ( var i=32; i > 0; i-- )
 //  for ( var i=16; i > 0; i-- )
-    for ( var i=8; i > 0; i-- )
+//  for ( var i=8; i > 0; i-- )
+//  for ( var i=2; i > 0; i-- )
     {
         graph.push( g.gameFactory.newCodeTrail( get_n(), get_x(), get_y(), get_delay() ) );
     } 
