@@ -41,13 +41,43 @@ var main = function()
   });
 
   test( "game states", function(){
+    expect(3);
     equal( yarn.state, yarn.GAME_IS_RUNNING, "the game by default should be running" ); 
 
     yarn.pause();
     equal( yarn.state, yarn.GAME_IS_PAUSED, "the game should be able to pause" ); 
 
-    yarn.resume();
-    equal( yarn.state, yarn.GAME_IS_RUNNING, "the game should be able to resume after a pause." ); 
-
+    //
+    // BUG: can't immediately resume after a pause
+    // due to the possiblity of double-game-looping...
+    // 
+    stop();
+    setTimeout(function(){
+      yarn.resume();
+    }, 500 ); 
+    setTimeout(function(){
+      start();
+      equal( yarn.state, yarn.GAME_IS_RUNNING, "the game should be able to resume after a pause." ); 
+    }, 500 ); 
   }); 
+
+  test( "the main game loop", function() {
+    yarn.resume(); 
+    stop();  
+
+    setTimeout(function(){
+      start();
+      var is_above_30_fps = yarn.fps > 30;
+      console.debug( "yarn.fps is "+yarn.fps );
+      equal( is_above_30_fps, true, "should run at or above 30 frames per second." ); 
+    }, 2000 );
+  });
+
+  //
+  // eventually stop the game loop...
+  // 
+  setTimeout(function(){
+    console.debug( "it's been 15 seconds, time to shut down our test game loop..." );
+    yarn.pause();
+  }, 15 * 1000 );
 }

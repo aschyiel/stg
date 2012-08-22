@@ -24,15 +24,59 @@
 *
 * game.js uses the global namespace "yarn"
 *
+* references:
+*   game loops:
+*   http://nokarma.org/2011/02/02/javascript-game-development-the-game-loop/index.html
+*   https://developer.mozilla.org/en-US/docs/DOM/window.requestAnimationFrame
+*
+*   math:
+*   http://james.padolsey.com/javascript/double-bitwise-not/
+*
 */
-var yarn = function(){
-  return { 
-    GAME_IS_PAUSED: 1,
-    GAME_IS_RUNNING: 2, 
-    state: null,
-    canvas: null
-  };
-}; 
+yarn = (function(){
+
+  //
+  // private class,
+  // to help define some properties belonging to our game.
+  //
+
+  var YarnGame = function(){
+    var game = this;
+    //
+    // game states.
+    //
+    game.GAME_IS_PAUSED = 1;
+    game.GAME_IS_RUNNING = 2; 
+
+    // The current game state.
+    game.state = -1; 
+
+    // The canvas view we will draw to.
+    game.canvas = null;
+
+    // the current frames per second we are running at.
+    // for testing purposes.
+    game.fps = 0; 
+  }; 
+  return new YarnGame();
+})();
+
+/**
+* @public
+* round a number.
+* @param n - the number to round.
+* @return number.
+*/
+yarn.round = function( n ) {
+  return ~~( n + 0.5 );
+} 
+
+/*
+* returns true if the game is paused.
+*/
+yarn.is_paused = function() {
+  return this.state == this.GAME_IS_PAUSED;
+}
 
 /*
 * pause the game.
@@ -47,18 +91,73 @@ yarn.pause = function() {
 */ 
 yarn.resume = function() {
   var game = this;
+  if ( game.GAME_IS_RUNNING == game.state || game._is_looping ) {
+    console.warn( "redundant resume called, game is already running so ignoring request to resume..." );
+    return;
+  }
+
   game.state = game.GAME_IS_RUNNING;
+  game._timestamp = new Date(); 
+  window.webkitRequestAnimationFrame( game.run ); 
+  game._is_looping = true;
 };
+
+/*
+* @private
+* update our game stats such as frames per second,
+* mostly for debugging purposes.
+*
+* @param delta - the difference in milliseconds between now and our last update.
+* @return void
+*/
+yarn.update_stats = function( delta ) {
+  var game = yarn;
+  var fps = game.round( 1000 / delta );
+  game.fps = fps; // used in testing to verify game loop is running.
+  console.debug( "fps:"+fps );  // TODO draw this...
+};
+
+/*
+* @private,
+* used to compare against the game loops timestamp
+* to calculate our delta time in milliseconds.
+*
+* This needs to get reset on resume.
+*/
+yarn._timestamp = new Date();
+
+/*
+* run our game loop,
+* called by request animation frame.
+*/
+yarn.run = function( timestamp ) { 
+  var game = yarn;
+  if ( game.is_paused() ) { 
+    game._is_looping = false;
+    return;
+  }
+  var delta_time = timestamp - game._timestamp;
+  game.update_stats( delta_time ); 
+  game._timestamp = new Date();
+  window.requestAnimationFrame( game.run );
+}; 
+
+/*
+* magically normalize the requestAnimationFrame api (from developer.mozilla.org).
+*/
+(function() {
+  var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+  window.requestAnimationFrame = requestAnimationFrame;
+})();
 
 /*
 * anonymous,
 * setup our game.
 */
 (function() {
-  var game = yarn;
-  game.state = game.GAME_IS_RUNNING;
-
+  var game = yarn; 
   game.canvas = $( 'canvas.yarn' )[0];
-
+  game.resume();
 })();
 
