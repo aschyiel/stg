@@ -23,22 +23,31 @@
 * throttling refresh rates, etc.
 *
 */ 
-$.ready(function(){ main(); });
+$(document).ready(function(){ main(); });
 
 var main = function()
 { 
+
+  test( "html view", function(){
+    expect(1);
+    var canvas = $('canvas.yarn')[0];
+    equal( !!canvas, true, "should provide a canvas of class \".yarn\"." );
+  });
+
   test( "The global \"yarn\" should exist.", function(){
-    ok( !!window.yarn, true, "\"yarn\" is non-null global variable." );
-    ok( !!window.yarn.canvas, true, "\"yarn\" should have a handle to it's canvas." );
-  }
+    expect(2);
+    equal( !!window.yarn, true, "\"yarn\" is our namespaced global variable (ie window.yarn)." );
+    equal( !!window.yarn.canvas, true, "\"yarn\" should have a handle to it's canvas via yarn.canvas." );
+  });
+
   test( "game states", function(){
-    ok( yarn.state, yarn.GAME_IS_RUNNING, "the game by default should be running" ); 
+    equal( yarn.state, yarn.GAME_IS_RUNNING, "the game by default should be running" ); 
 
     yarn.pause();
-    ok( yarn.state, yarn.GAME_IS_PAUSED, "the game should be able to pause" ); 
+    equal( yarn.state, yarn.GAME_IS_PAUSED, "the game should be able to pause" ); 
 
     yarn.resume();
-    ok( yarn.state, yarn.GAME_IS_RUNNING, "the game should be able to resume after a pause." ); 
+    equal( yarn.state, yarn.GAME_IS_RUNNING, "the game should be able to resume after a pause." ); 
 
   }); 
 }

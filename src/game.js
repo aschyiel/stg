@@ -17,14 +17,48 @@
 /*
 * game.js, uly, aug2012
 *
+* singleton,
+* has "official" prototype,
 * game.js runs the yarn game, and controls it's top level game-states,
 * as well as delegating events (such as keyboard events).
 *
 * game.js uses the global namespace "yarn"
 *
 */
-var yarn = function(){ return this; };
+var yarn = function(){
+  return { 
+    GAME_IS_PAUSED: 1,
+    GAME_IS_RUNNING: 2, 
+    state: null,
+    canvas: null
+  };
+}; 
 
-yarn.prototype.pause = function() {
+/*
+* pause the game.
+*/
+yarn.pause = function() {
+  var game = this;
+  game.state = game.GAME_IS_PAUSED;
+};
 
-}
+/*
+* resume the game.
+*/ 
+yarn.resume = function() {
+  var game = this;
+  game.state = game.GAME_IS_RUNNING;
+};
+
+/*
+* anonymous,
+* setup our game.
+*/
+(function() {
+  var game = yarn;
+  game.state = game.GAME_IS_RUNNING;
+
+  game.canvas = $( 'canvas.yarn' )[0];
+
+})();
+
