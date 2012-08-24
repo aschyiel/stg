@@ -20,8 +20,8 @@
 * bots represent destructable enemies in yarn.
 * players are supposed to shoot bots.
 *
-* This test demonstrates the both life-cycle,
-* and it's interaction with both the game graph (yarn.graph),
+* This test demonstrates the bot life-cycle,
+* and it's interaction with bot the game graph (yarn.graph),
 * and it's factory (yarn.plant).
 */ 
 $(document).ready(function(){ main(); });
@@ -41,7 +41,7 @@ var main = function()
 
   test( "Bots are destructable and", function(){
     var bot = yarn.plant.make_bot();
-    equal( both.hp > 0, true, "should have some hit points available before receiving any kind of damage." );
+    equal( bot.hp > 0, true, "should have some hit points available before receiving any kind of damage." );
 
     var hp0 = bot.hp;
     bot.take_damage( 1 );
@@ -56,7 +56,7 @@ var main = function()
     var i, 
         x0 = 10, 
         y0 = 10; // initial positions...
-    bot.set_position( x, y );
+    bot.set_position( x0, y0 );
     yarn.graph.push( bot );
 
     i = 3; while (i--) yarn.tick();
