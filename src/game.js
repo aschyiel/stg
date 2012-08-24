@@ -61,6 +61,19 @@ yarn = (function(){
   return new YarnGame();
 })();
 
+//--------------------------------------------------
+
+/*
+* magically normalize the requestAnimationFrame api (from developer.mozilla.org).
+*/
+(function() {
+  var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+  window.requestAnimationFrame = requestAnimationFrame;
+})();
+
+//--------------------------------------------------
+
 /**
 * @public
 * round a number.
@@ -138,26 +151,51 @@ yarn.run = function( timestamp ) {
   }
   var delta_time = timestamp - game._timestamp;
   game.update_stats( delta_time ); 
+  game.tick( delta_time );
   game._timestamp = new Date();
   window.requestAnimationFrame( game.run );
 }; 
 
+yarn.WORLD_STEP_FRAME_RATE = 1 / 60;
+yarn.VELOCITY_ITERATIONS = 8;
+yarn.POSITION_ITERATIONS = 3;
+
 /*
-* magically normalize the requestAnimationFrame api (from developer.mozilla.org).
+* animate our game for a single cycle/animation-frame;
+* Because this is a separate function from yarn.run, it simplifies unit testing.
+* @param dt - delta time in msec.
+* @return void
 */
-(function() {
-  var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-                              window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-  window.requestAnimationFrame = requestAnimationFrame;
-})();
+yarn.tick = function( dt ) {
+  var yarn = this;
+  if ( !yarn.graph ) {
+    console.warn( "graph is not ready yet, ignoring tick request. Try using the EVENT_GAME_READY event?" );
+    return;
+  }
+  var world = yarn.graph.world;
+
+  yarn.graph.update( dt );
+
+  world.Step( yarn.WORLD_STEP_FRAME_RATE, 
+              yarn.VELOCITY_ITERATIONS, 
+              yarn.POSITION_ITERATIONS ); 
+  world.DrawDebugData();  // TODO
+  world.ClearForces();
+} 
+
+yarn.EVENT_GAME_READY = "YARN_EVENT_GAME_READY";
 
 /*
 * anonymous,
-* setup our game.
+* setup our game to run.
 */
 (function() {
-  var game = yarn; 
-  game.canvas = $( 'canvas.yarn' )[0];
-  game.resume();
-})();
+  $(document).ready(function(){
+    console.debug( "setting up yarn, and kick-starting the game loop." );
+    var game = yarn; 
+    game.canvas = $( 'canvas.yarn' )[0];
+    game.resume();
+    $(document).trigger( game.EVENT_GAME_READY ); // needed for testing.
+  });
+}());
 

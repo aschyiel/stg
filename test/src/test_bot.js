@@ -24,19 +24,32 @@
 * and it's interaction with bot the game graph (yarn.graph),
 * and it's factory (yarn.plant).
 */ 
-$(document).ready(function(){ main(); });
+
+var b2Body =         Box2D.Dynamics.b2Body;
 
 var main = function()
 { 
+  console.debug( "test_bot start." );
   configure_yarn_for_testing(); 
 
   test( "Bots are constructable and", function(){
     var bot = yarn.plant.make_bot();
+    equal( bot._is_new, true, "should be marked as \"new\" for the grapher." );
+    equal( bot.is_dirty(), true, "should be flagged as \"dirty\" for the grapher so it knows to do something with it when it is added." );
     equal( !!bot, true, "should be generated via yarn.plant.make_bot()." );
+    equal( !!bot.body_def, true, "should have a body definition ready to go for the grapher." );
+    equal( 
+        bot.body_def.type, 
+        Box2D.Dynamics.b2Body.b2_dynamicBody, 
+        "should have a dynamic body definition." );
 
     yarn.graph.push( bot );
+    var i = 3;
+    while ( i-- ) yarn.tick();
     equal( yarn.graph.contains( bot ), true, "should be added to the game world via yarn.graph.push()." ); 
-    yarn.graph.remove( bot );
+    i = 3;
+//  while ( i-- ) yarn.tick();
+//  yarn.graph.remove( bot );
   });
 
   test( "Bots are destructable and", function(){
@@ -59,18 +72,27 @@ var main = function()
     bot.set_position( x0, y0 );
     yarn.graph.push( bot );
 
+    // TODO should game-objects have a convenience get_body_x method?
+
+    var get_x = function() {
+      return bot.body.GetPosition().x; 
+    };
+    var get_y = function() {
+      return bot.body.GetPosition().y; 
+    }; 
+
     i = 3; while (i--) yarn.tick();
-    equal( (bot.x != x0 && bot.y != y0), true, "move around." );
+    equal( (get_x() != x0 && get_y() != y0), true, "move around." );
 
     bot.set_position( 0, 0 );   //..top left corner of map..
     bot.set_velocity( 0, -3 );
     i = 3; while (i--) yarn.tick();
-    equal( bot.y > 0, true, "wrap their movement around the map vertically." );
+    equal( get_y() > 0, true, "wrap their movement around the map vertically." );
 
     bot.set_position( 0, 0 ); 
     bot.set_velocity( -3, 0 );
     i = 3; while (i--) yarn.tick();
-    equal( bot.x > 0, true, "wrap their movement around the map horizontally as well." );
+    equal( get_x() > 0, true, "wrap their movement around the map horizontally as well." );
 
     var bot2 = yarn.plant.make_bot();
     yarn.graph.push( bot2 );
@@ -82,8 +104,8 @@ var main = function()
       bot2_is_still_on_the_right = bot2.x > 50;
     equal( bot_is_still_on_left_side && bot2_is_still_on_the_right, true, "collide with each other" );
 
-    yarn.graph.remove( bot );
-    yarn.graph.remove( bot2 );
+//  yarn.graph.remove( bot );
+//  yarn.graph.remove( bot2 );
   } );
 
 } 
@@ -96,3 +118,5 @@ var main = function()
 var configure_yarn_for_testing = function() {
   yarn.pause();
 }
+
+$(document).on( yarn.EVENT_GAME_READY, main ); 

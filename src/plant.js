@@ -21,6 +21,21 @@
 */
 yarn.plant = (function(){ 
 
+  //
+  // locally import box2d
+  //
+  var b2Vec2 =         Box2D.Common.Math.b2Vec2;
+  var b2BodyDef =      Box2D.Dynamics.b2BodyDef;
+  var b2Body =         Box2D.Dynamics.b2Body;
+  var b2FixtureDef =   Box2D.Dynamics.b2FixtureDef;
+  var b2Fixture =      Box2D.Dynamics.b2Fixture;
+  var b2World =        Box2D.Dynamics.b2World;
+  var b2DebugDraw =    Box2D.Dynamics.b2DebugDraw; 
+  var b2MassData =     Box2D.Collision.Shapes.b2MassData;
+  var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
+  var b2CircleShape =  Box2D.Collision.Shapes.b2CircleShape; 
+
+
   //--------------------------------------------------
   //
   // private/inner classes
@@ -28,12 +43,72 @@ yarn.plant = (function(){
   //--------------------------------------------------
 
   var ManufacturingPlant = function(){}; 
-  var GameObject =         function(){}; 
-  var Bot =                function(){};
+  var GameObject =         function(){
+    var game_object = this;
+    game_object._is_new = true;
+    game_object._is_velocity_dirty = false;
+    game_object._is_position_dirty = false; 
+  }; 
+  var Bot =                function(){}; 
+ 
+  /*
+  * Render the gameobject onto the canvas.
+  */
+  GameObject.prototype.draw = function() {
+    var game_object = this;
+    // TODO
+  }
 
   /*
+  * returns true if the game object wants to 
+  * tell the grapher to update it's box2d body position.
+  */
+  GameObject.prototype.is_position_dirty = function() {
+    var game_object = this;
+    return game_object._is_position_dirty;
+  }
+
+  /*
+  * returns true if the game object wants to 
+  * tell the grapher to update/overwrite it's box2d body's velocity.
+  */
+  GameObject.prototype.is_velocity_dirty = function() {
+    var game_object = this;
+    return game_object._is_velocity_dirty;
+  }
+
+  /*
+  * Tell the game object to update it's box2d body's coordinate position.
+  * To be called by the grapher during it's update cycle.
+  */
+  GameObject.prototype.update_body_position = function() {
+    var game_object = this;
+    game_object.body.SetPosition( 
+        new b2Vec2( game_object.x, game_object.y ) );
+  }
+
+  /*
+  * Tell the game object to correct it's box2d body's instantaneous velocity.
+  * To be called by the grapher during it's update cycle.
+  */
+  GameObject.prototype.update_body_velocity = function() {
+    var game_object = this;
+    game_object.body.SetLinearVelocity( 
+        new b2Vec2( game_object.vx, game_object.vy ) );
+  }
+
+  /*
+  * returns true if the game object needs to be removed from the game.
+  * ie. If a Bot gets killed, it will need to be marked for removal.
+  * ie2. A projectile detonates, it will need to be removed as well.
+  */
+  GameObject.prototype.needs_removed = function() {
+    var game_object = this;
+    return 0 == game_object.hp; // TODO out-of-bounds, may be "timers"? 
+  }
+  /*
   * chainable,
-  * set the game object's corrdinate position relative to the box2d world.
+  * request to update the game object's corrdinate position relative to the box2d world.
   * @param x - the x corrdinate in meters.
   * @param y - the y corrdinate in meters.
   * @return GameObject
@@ -42,6 +117,7 @@ yarn.plant = (function(){
     var game_object = this;
     game_object.x = x;
     game_object.y = y;
+    game_object._is_position_dirty = true;
     return game_object;
   }
 
@@ -56,8 +132,49 @@ yarn.plant = (function(){
     var game_object = this;
     game_object.vx = vx;
     game_object.vy = vy;
+    game_object._is_velocity_dirty = true;
     return game_object;
   }
+
+  /*
+  * chainable,
+  * set the box2d body definition for this game object.
+  * @param body_def (Box2D.Dynamics.b2BodyDef)
+  * @return GameObject
+  */
+  GameObject.prototype.set_body_def = function( body_def ) {
+    var game_object = this;
+    game_object.body_def = body_def;
+    return game_object;
+  }
+
+  /*
+  * returns true if this game object needs to be added/removed from the graph,
+  * or it's box2d body representation needs to be updated by the grapher.
+  */
+  GameObject.prototype.is_dirty = function() {
+    var game_object = this;
+    return game_object._is_position_dirty || 
+        game_object._is_velocity_dirty    || 
+        game_object._is_new               ||
+        0 == game_object.hp;
+  }
+
+  /*
+  * Reset this game-object's various isDirty indicators
+  * so that the next call to is_dirty() will return false.
+  *
+  * note: does not bother with the game-object's hp 
+  * which is an isDirty indicator for removal/death.
+  */
+  GameObject.prototype.unflag_is_dirty = function() {
+    var game_object = this;
+    game_object._is_position_dirty = false;
+    game_object._is_velocity_dirty = false;
+    game_object._is_new = false;
+  }
+
+  //--------------------------------------------------
 
   /*
   * chainable,
@@ -111,6 +228,7 @@ yarn.plant = (function(){
   * @return bot
   */
   ManufacturingPlant.prototype.make_bot = function() {
+    var plant = this;
     var bot = $.extend( {}, 
         new GameObject, 
         new Bot ); 
@@ -118,10 +236,22 @@ yarn.plant = (function(){
     // TODO set the bot's sprite...
 
     return bot
+        .set_body_def( plant._bot_body_def )
         .set_position( 0, 0 )
         .set_velocity( 0, 0 )
         .set_health( 1 );
-  };
+  }; 
+
+  /*
+  * The "static" bot body definition.
+  */
+  ManufacturingPlant.prototype._bot_body_def = (function(){
+    var body_def = new b2BodyDef(); 
+    body_def.type = b2Body.b2_dynamicBody;
+    body_def.position.x = 0;
+    body_def.position.y = 0;
+    return body_def;
+  }());
 
   return new ManufacturingPlant();
 })();
