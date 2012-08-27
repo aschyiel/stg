@@ -17,25 +17,9 @@
 /*
 * graph.js, uly, aug2012
 *
-* The yarn.graph singleton manages the game graph and abstracts the box2d world concept.
-* When game objects are appended to the graph, they are populated into the box2d world.
-* Likewise when they are removed they are also removed from the world.
+* The yarn.graph singleton manages the game graph and "world" concept away from game objects.
 */
 yarn.graph = (function(){ 
-
-  //
-  // locally import box2d
-  //
-  var b2Vec2 =         Box2D.Common.Math.b2Vec2;
-  var b2BodyDef =      Box2D.Dynamics.b2BodyDef;
-  var b2Body =         Box2D.Dynamics.b2Body;
-  var b2FixtureDef =   Box2D.Dynamics.b2FixtureDef;
-  var b2Fixture =      Box2D.Dynamics.b2Fixture;
-  var b2World =        Box2D.Dynamics.b2World;
-  var b2DebugDraw =    Box2D.Dynamics.b2DebugDraw; 
-  var b2MassData =     Box2D.Collision.Shapes.b2MassData;
-  var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
-  var b2CircleShape =  Box2D.Collision.Shapes.b2CircleShape; 
 
   //--------------------------------------------------
   //
@@ -61,12 +45,7 @@ yarn.graph = (function(){
     * A list of vacancy indices,
     * used to fill gaps in our model.
     */
-    graph._vacancies = [];
-
-    /*
-    * the box2d world.
-    */
-    graph.world = null;
+    graph._vacancies = []; 
   }; 
 
   //--------------------------------------------------
@@ -156,13 +135,11 @@ yarn.graph = (function(){
   */
   GameGraph.prototype._remove_game_object = function( item, index ) {
     var graph = this,
-      model = this._game_objects,
-      body = item.body;
+      model = this._game_objects;
       
-    graph.world.DestroyBody( body ); 
-    model[ index ] = item = body = null;
+    model[ index ] = null;
     graph._vacancies << index;
-  }
+  };
 
   /**
   * @public
@@ -175,7 +152,7 @@ yarn.graph = (function(){
   GameGraph.prototype.push = function( item ) {
     var graph = this;
     graph._push_queue.push( item );
-  }
+  };
 
   /**
   * @public
@@ -186,7 +163,7 @@ yarn.graph = (function(){
   */ 
   GameGraph.prototype.remove = function( item ) {
     item.kill();
-  }
+  };
 
   /*
   * @private,
@@ -197,39 +174,19 @@ yarn.graph = (function(){
     graph._game_objects = [];
     graph._push_queue = []; 
     graph._vacancies = []; 
-    graph.world = new b2World( 
-      new b2Vec2( 0, 0 ),  
-      true );              
-    graph.world = null; // TODO Do I need to explicitly destroy each body?
-    graph.world = graph._make_world();
-  };
-
-  /*
-  * generate the default graph world.
-  * @return b2World
-  */
-  GameGraph.prototype._make_world = function() {
-    return new b2World( 
-        new b2Vec2( 0, 0 ),  //..zero gravity..
-        true );              //..sleep inactive bodies..  
-  };
+  }; 
 
   /*
   * @pseudo-private
-  * Insert a game object into the box2d world and into our object model.
+  * Insert a game object into the world.
   * @param item - GameObject
-  * @param index - optional, the index to insert the game object at.
+  * @param index - optional, the vacancy index to insert the game object at.
   * @return void
   */
   GameGraph.prototype._insert_game_object = function( item, index ) {
     var graph = this,
       model = this._game_objects,
       body; 
-
-    body = graph.world.CreateBody( item.body_def );
-    body.CreateFixture( item.fixture_def );
-    item.body = body;           // important: Create a circular-reference 
-    body.SetUserData( item );   // tying together the yarn game object and the box2d body.
 
     if ( null !== index ) {
       model[ index ] = item; 
@@ -250,8 +207,6 @@ yarn.graph = (function(){
 
   //--------------------------------------------------
 
-  var graph = new GameGraph(); 
-  graph.world = graph._make_world();
-  return graph;
+  return new GameGraph(); 
 })();
 

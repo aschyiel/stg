@@ -21,21 +21,6 @@
 */
 yarn.plant = (function(){ 
 
-  //
-  // locally import box2d
-  //
-  var b2Vec2 =         Box2D.Common.Math.b2Vec2;
-  var b2BodyDef =      Box2D.Dynamics.b2BodyDef;
-  var b2Body =         Box2D.Dynamics.b2Body;
-  var b2FixtureDef =   Box2D.Dynamics.b2FixtureDef;
-  var b2Fixture =      Box2D.Dynamics.b2Fixture;
-  var b2World =        Box2D.Dynamics.b2World;
-  var b2DebugDraw =    Box2D.Dynamics.b2DebugDraw; 
-  var b2MassData =     Box2D.Collision.Shapes.b2MassData;
-  var b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape;
-  var b2CircleShape =  Box2D.Collision.Shapes.b2CircleShape; 
-
-
   //--------------------------------------------------
   //
   // private/inner classes
@@ -46,7 +31,6 @@ yarn.plant = (function(){
   var GameObject =         function(){
     var game_object = this;
     game_object._is_new = true;
-    game_object._is_velocity_dirty = false;
     game_object._is_position_dirty = false; 
   }; 
   var Bot =                function(){}; 
@@ -57,25 +41,7 @@ yarn.plant = (function(){
   GameObject.prototype.draw = function() {
     var game_object = this;
     // TODO
-  };
-
-  /*
-  * returns true if the game object wants to 
-  * tell the grapher to update it's box2d body position.
-  */
-  GameObject.prototype.is_position_dirty = function() {
-    var game_object = this;
-    return game_object._is_position_dirty;
-  };
-
-  /*
-  * returns true if the game object wants to 
-  * tell the grapher to update/overwrite it's box2d body's velocity.
-  */
-  GameObject.prototype.is_velocity_dirty = function() {
-    var game_object = this;
-    return game_object._is_velocity_dirty;
-  };
+  }; 
 
   /*
   * Tell the game object to update it's box2d body's coordinate position.
@@ -120,6 +86,9 @@ yarn.plant = (function(){
   */
   GameObject.prototype.set_position = function( x, y ) {
     var game_object = this;
+    if ( x === game_object.x || y === game_object.y ) {
+      return game_object; // Since there is no position change, be sure to skip the "is-dirty" logic.
+    }
     game_object.x = x;
     game_object.y = y;
     game_object._is_position_dirty = true;
@@ -137,33 +106,6 @@ yarn.plant = (function(){
     var game_object = this;
     game_object.vx = vx;
     game_object.vy = vy;
-    game_object._is_velocity_dirty = true;
-    return game_object;
-  };
-
-  /*
-  * chainable,
-  * set the box2d body definition for this game object.
-  * @param body_def (Box2D.Dynamics.b2BodyDef)
-  * @return GameObject
-  */
-  GameObject.prototype.set_body_def = function( body_def ) {
-    var game_object = this;
-    game_object.body_def = body_def;
-    return game_object;
-  };
-
-  /*
-  * chainable,
-  * set the box2d fixture definition for this game object.
-  * The fixture def is used to determine the physical characteristics 
-  * of the box2d body representation.
-  * @param fixture_def (Box2D.Dynamics.b2FixtureDef)
-  * @return GameObject
-  */
-  GameObject.prototype.set_fixture_def = function( fixture_def ) {
-    var game_object = this;
-    game_object.fixture_def = fixture_def;
     return game_object;
   };
 
@@ -174,7 +116,6 @@ yarn.plant = (function(){
   GameObject.prototype.is_dirty = function() {
     var game_object = this;
     return game_object._is_position_dirty || 
-        game_object._is_velocity_dirty    || 
         game_object._is_new               ||
         0 == game_object.hp;
   };
@@ -189,9 +130,20 @@ yarn.plant = (function(){
   GameObject.prototype.unflag_is_dirty = function() {
     var game_object = this;
     game_object._is_position_dirty = false;
-    game_object._is_velocity_dirty = false;
     game_object._is_new = false;
   };
+
+  /*
+  * update the coordinates for the game-object based on it's velocities.
+  */
+  GameObject.prototype.update_position = function() {
+    var game_object = this; 
+    var x = game_object.x,
+      y =   game_object.y,
+      vx =  game_object.vx,
+      vy =  game_object.vy;
+    game_object.set_position( x + vx, y + vy );
+  }
 
   /*
   * to be called by the game loop during an update,
@@ -201,12 +153,7 @@ yarn.plant = (function(){
   */
   GameObject.prototype.update = function() {
     var game_object = this; 
-    if ( game_object.is_position_dirty() ) {
-      game_object.update_body_position();
-    } 
-//  if ( game_object.is_velocity_dirty() ) {
-      game_object.update_body_velocity();
-//  } 
+    game_object.update_position(); 
   };
 
   //--------------------------------------------------
@@ -285,38 +232,10 @@ yarn.plant = (function(){
     // TODO set the bot's sprite...
 
     return bot
-        .set_body_def(    plant._bot_body_def )
-        .set_fixture_def( plant._bot_fixture_def )
         .set_position( 0, 0 )
         .set_velocity( 0, 0 )
         .set_health( 1 );
   }; 
-
-  /*
-  * The "static" bot body definition.
-  */
-  ManufacturingPlant.prototype._bot_body_def = (function(){
-    var body_def = new b2BodyDef(); 
-    body_def.type = b2Body.b2_dynamicBody;
-    body_def.position.x = 0;
-    body_def.position.y = 0;
-    return body_def;
-  }());
-
-  /*
-  * static,
-  * bots are represented as little 1 meter-square boxes.
-  * Assuming a scale of 30, this should translate to 30 x 30 pixel boxes.
-  */
-  ManufacturingPlant.prototype._bot_fixture_def = (function(){
-    var fixture_def = new b2FixtureDef(); 
-    fixture_def.density =     1.0;
-    fixture_def.friction =    0.5;  
-    fixture_def.restitution = 0.2;  
-    fixture_def.shape = new b2PolygonShape();
-    fixture_def.shape.SetAsBox( 0.5, 0.5 );
-    return fixture_def;
-  }());
 
   return new ManufacturingPlant();
 })();

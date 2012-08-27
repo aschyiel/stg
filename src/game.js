@@ -32,9 +32,6 @@
 *   math:
 *   http://james.padolsey.com/javascript/double-bitwise-not/
 *
-*   box2d
-*   https://github.com/sethladd/box2d-javascript-fun/blob/master/static/04/index.html
-*
 */
 yarn = (function(){
 
@@ -64,13 +61,8 @@ yarn = (function(){
   return new YarnGame();
 })();
 
-yarn.WORLD_STEP_FRAME_RATE = 1 / 60;
-yarn.VELOCITY_ITERATIONS = 8;
-yarn.POSITION_ITERATIONS = 3;
 yarn.EVENT_GAME_READY = "YARN_EVENT_GAME_READY";
 
-/* box2ed scale, apparently the recommended value is 30. */
-yarn.SCALE = 30;
 
 //--------------------------------------------------
 
@@ -162,11 +154,10 @@ yarn.run = function( timestamp ) {
   }
   var delta_time = timestamp - game._timestamp;
   game.update_stats( delta_time ); 
-  game.tick( delta_time );
+//game.tick( delta_time );
   game._timestamp = new Date();
   window.requestAnimationFrame( game.run );
 }; 
-
 
 /*
 * animate our game for a single cycle/animation-frame;
@@ -181,39 +172,22 @@ yarn.tick = function( dt ) {
     console.warn( "graph is not ready yet, ignoring tick request. Try using the EVENT_GAME_READY event?" );
     return;
   }
-  var world = yarn.graph.world;
 
-  yarn.graph.update( dt );
-
-  world.Step( yarn.WORLD_STEP_FRAME_RATE, 
-              yarn.VELOCITY_ITERATIONS, 
-              yarn.POSITION_ITERATIONS ); 
-  world.DrawDebugData();  // TODO
-  world.ClearForces();
+  yarn.graph.update( dt ); 
 }; 
 
 /*
-* Setup our box2d debug drawing.
+* the game's keydown handler.
+* The way yarn is setup, the user controls the world's "tick-rate" 
+* based on how much user-input they put in.
+*
+* When keys aren't being pressed down, it effectively 
+* pauses/suspends the game world's physics;
+* Thus giving the player time to think their next move out.
 */
-yarn.setup_draw_debug = function( canvas ) {
-  console.debug( "..setup_draw_debug.." );
-  var game = this; 
-  var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
-  var debug_draw = new b2DebugDraw();
-  
-  if ( !canvas ) {
-    console.warn( "null canvas" );
-    return;
-  }
-  debug_draw.SetSprite( canvas.getContext( "2d" ) );
-  debug_draw.SetDrawScale( game.SCALE );
-  debug_draw.SetFillAlpha( 0.3 );
-  debug_draw.SetLineThickness(1.0);
-  debug_draw.SetFlags( b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit );
-
-  game.debug_draw = debug_draw;
-  game.graph.world.SetDebugDraw( game.debug_draw );
-};
+yarn.handle_keydown = function( event ) {
+  console.debug( "keydown event:"+event ); 
+} 
 
 /*
 * anonymous,
@@ -224,8 +198,8 @@ yarn.setup_draw_debug = function( canvas ) {
   $(document).ready(function(){
     console.debug( "setting up yarn, and kick-starting the game loop." );
     game.canvas = $( 'canvas.yarn' )[0];
+    $( game.canvas ).keydown( yarn.handle_keydown );
     console.debug( "canvas:"+game.canvas );
-    game.setup_draw_debug( game.canvas );  // TODO
     game.resume();
     $(document).trigger( game.EVENT_GAME_READY ); // needed for testing.
   });
