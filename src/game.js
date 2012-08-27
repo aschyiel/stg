@@ -32,6 +32,9 @@
 *   math:
 *   http://james.padolsey.com/javascript/double-bitwise-not/
 *
+*   box2d
+*   https://github.com/sethladd/box2d-javascript-fun/blob/master/static/04/index.html
+*
 */
 yarn = (function(){
 
@@ -61,6 +64,14 @@ yarn = (function(){
   return new YarnGame();
 })();
 
+yarn.WORLD_STEP_FRAME_RATE = 1 / 60;
+yarn.VELOCITY_ITERATIONS = 8;
+yarn.POSITION_ITERATIONS = 3;
+yarn.EVENT_GAME_READY = "YARN_EVENT_GAME_READY";
+
+/* box2ed scale, apparently the recommended value is 30. */
+yarn.SCALE = 30;
+
 //--------------------------------------------------
 
 /*
@@ -82,7 +93,7 @@ yarn = (function(){
 */
 yarn.round = function( n ) {
   return ~~( n + 0.5 );
-} 
+}; 
 
 /*
 * returns true if the game is paused.
@@ -156,9 +167,6 @@ yarn.run = function( timestamp ) {
   window.requestAnimationFrame( game.run );
 }; 
 
-yarn.WORLD_STEP_FRAME_RATE = 1 / 60;
-yarn.VELOCITY_ITERATIONS = 8;
-yarn.POSITION_ITERATIONS = 3;
 
 /*
 * animate our game for a single cycle/animation-frame;
@@ -167,6 +175,7 @@ yarn.POSITION_ITERATIONS = 3;
 * @return void
 */
 yarn.tick = function( dt ) {
+  console.debug( "..yarn.tick.." );
   var yarn = this;
   if ( !yarn.graph ) {
     console.warn( "graph is not ready yet, ignoring tick request. Try using the EVENT_GAME_READY event?" );
@@ -181,19 +190,42 @@ yarn.tick = function( dt ) {
               yarn.POSITION_ITERATIONS ); 
   world.DrawDebugData();  // TODO
   world.ClearForces();
-} 
+}; 
 
-yarn.EVENT_GAME_READY = "YARN_EVENT_GAME_READY";
+/*
+* Setup our box2d debug drawing.
+*/
+yarn.setup_draw_debug = function( canvas ) {
+  console.debug( "..setup_draw_debug.." );
+  var game = this; 
+  var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+  var debug_draw = new b2DebugDraw();
+  
+  if ( !canvas ) {
+    console.warn( "null canvas" );
+    return;
+  }
+  debug_draw.SetSprite( canvas.getContext( "2d" ) );
+  debug_draw.SetDrawScale( game.SCALE );
+  debug_draw.SetFillAlpha( 0.3 );
+  debug_draw.SetLineThickness(1.0);
+  debug_draw.SetFlags( b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit );
+
+  game.debug_draw = debug_draw;
+  game.graph.world.SetDebugDraw( game.debug_draw );
+};
 
 /*
 * anonymous,
 * setup our game to run.
 */
 (function() {
+  var game = yarn;
   $(document).ready(function(){
     console.debug( "setting up yarn, and kick-starting the game loop." );
-    var game = yarn; 
     game.canvas = $( 'canvas.yarn' )[0];
+    console.debug( "canvas:"+game.canvas );
+    game.setup_draw_debug( game.canvas );  // TODO
     game.resume();
     $(document).trigger( game.EVENT_GAME_READY ); // needed for testing.
   });

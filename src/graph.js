@@ -97,25 +97,22 @@ yarn.graph = (function(){
       body;
 
     for ( ; i < len; i++ ) {
-      game_object = model[ i ];
+      game_object = model[ i ]; 
 
-      //
       // skip items that don't need our attention.
-      //
-      if ( null === game_object || !game_object.is_dirty() ) {
+      if ( null === game_object ) {
         continue;
       } 
 
-      if ( game_object.is_position_dirty() ) {
-        game_object.update_body_position();
+      game_object.update(); 
+      game_object.draw();   // TODO this is wrong if removed/killed.
+
+      // skip items that don't need our attention. (x2)
+      if ( !game_object.is_dirty() ) {
+        continue;
       } 
-      if ( game_object.is_velocity_dirty() ) {
-        game_object.update_body_velocity();
-      }
 
-      // TODO deal damage
-
-      game_object.draw(); 
+      // TODO deal damage 
 
       // 
       // remove items toward the end of the update loop,
@@ -192,6 +189,32 @@ yarn.graph = (function(){
   }
 
   /*
+  * @private,
+  * for testing purposes, make it really easy to clear our model.
+  */
+  GameGraph.prototype._clear_game_graph = function() {
+    var graph = this;
+    graph._game_objects = [];
+    graph._push_queue = []; 
+    graph._vacancies = []; 
+    graph.world = new b2World( 
+      new b2Vec2( 0, 0 ),  
+      true );              
+    graph.world = null; // TODO Do I need to explicitly destroy each body?
+    graph.world = graph._make_world();
+  };
+
+  /*
+  * generate the default graph world.
+  * @return b2World
+  */
+  GameGraph.prototype._make_world = function() {
+    return new b2World( 
+        new b2Vec2( 0, 0 ),  //..zero gravity..
+        true );              //..sleep inactive bodies..  
+  };
+
+  /*
   * @pseudo-private
   * Insert a game object into the box2d world and into our object model.
   * @param item - GameObject
@@ -204,6 +227,7 @@ yarn.graph = (function(){
       body; 
 
     body = graph.world.CreateBody( item.body_def );
+    body.CreateFixture( item.fixture_def );
     item.body = body;           // important: Create a circular-reference 
     body.SetUserData( item );   // tying together the yarn game object and the box2d body.
 
@@ -226,11 +250,8 @@ yarn.graph = (function(){
 
   //--------------------------------------------------
 
-  var graph = new GameGraph();
-
-  graph.world = new b2World( 
-      new b2Vec2( 0, 0 ),  //..zero gravity..
-      true );              //..sleep inactive bodies..
+  var graph = new GameGraph(); 
+  graph.world = graph._make_world();
   return graph;
 })();
 

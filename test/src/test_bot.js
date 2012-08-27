@@ -48,8 +48,10 @@ var main = function()
     while ( i-- ) yarn.tick();
     equal( yarn.graph.contains( bot ), true, "should be added to the game world via yarn.graph.push()." ); 
     i = 3;
-//  while ( i-- ) yarn.tick();
-//  yarn.graph.remove( bot );
+    while ( i-- ) yarn.tick();
+    yarn.graph.remove( bot );
+    i = 3;
+    while ( i-- ) yarn.tick();
   });
 
   test( "Bots are destructable and", function(){
@@ -64,12 +66,38 @@ var main = function()
     equal( bot.hp, 0, "should have 0 hit points if they are killed." );
   }); 
 
+  test( "Bots can set their box2d properties such as", function() {
+
+    var bot = yarn.plant.make_bot(),
+        x0 = 40, 
+        y0 = 10;
+
+    bot.set_position( x0, y0 );
+    yarn.graph.push( bot ); 
+    yarn.tick();
+    yarn.tick();  // note: as implemented, additions take 2 iterations,
+                  // becuase adds are dealt with at the end of the first iteration.
+
+    equal( yarn.round( bot.body.GetPosition().x ), x0, "the box2d x coordinate." );
+    equal( yarn.round( bot.body.GetPosition().y ), y0, "the box2d y coordinate." );
+
+    var vx = 10,
+      vy = 5;
+    bot.set_velocity( vx, vy );
+    yarn.tick();
+    equal( bot.body.GetLinearVelocity().x, vx, "the box2d velocity in the x direction." );
+    equal( bot.body.GetLinearVelocity().y, vy, "the box2d velocity in the y direction." );
+
+    yarn.graph._clear_game_graph();
+  });
+
   test( "While in play, bots should be able to", function() {
     var bot = yarn.plant.make_bot();
     var i, 
-        x0 = 10, 
+        x0 = 40, 
         y0 = 10; // initial positions...
-    bot.set_position( x0, y0 );
+    bot.set_position( x0, y0 )
+        .set_velocity( 2, 2 );
     yarn.graph.push( bot );
 
     // TODO should game-objects have a convenience get_body_x method?
@@ -94,18 +122,26 @@ var main = function()
     i = 3; while (i--) yarn.tick();
     equal( get_x() > 0, true, "wrap their movement around the map horizontally as well." );
 
+    var bot1_x = 50,
+      bot2_x = 55,
+      vx = 10;
     var bot2 = yarn.plant.make_bot();
     yarn.graph.push( bot2 );
-    bot.set_position( 50, 10 ); bot2.set_position( 55, 10 );  //..on same x axis, bot on left, bot2 on right..
-    bot.set_velocity( 2, 0 ); bot2.set_velocity( -2, 0 ); 
+    bot.set_position( bot1_x, 0 ); bot2.set_position( bot2_x, 0 );  //..on same x axis, bot on left, bot2 on right..
+    bot.set_velocity( vx, 0 ); bot2.set_velocity( -vx, 0 ); 
 
     i = 3; while (i--) yarn.tick();
-    var bot_is_still_on_left_side = bot.x < 55,
-      bot2_is_still_on_the_right = bot2.x > 50;
+    var bot_is_still_on_left_side = bot.x < bot2_x,
+      bot2_is_still_on_the_right = bot2.x > bot1_x;
     equal( bot_is_still_on_left_side && bot2_is_still_on_the_right, true, "collide with each other" );
 
-//  yarn.graph.remove( bot );
-//  yarn.graph.remove( bot2 );
+    window.bot1 = bot;
+    window.bot2 = bot2;
+    yarn.graph.remove( bot );
+    yarn.graph.remove( bot2 );
+    i = 3;
+    while ( i-- ) yarn.tick();
+
   } );
 
 } 

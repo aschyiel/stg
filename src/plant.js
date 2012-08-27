@@ -57,7 +57,7 @@ yarn.plant = (function(){
   GameObject.prototype.draw = function() {
     var game_object = this;
     // TODO
-  }
+  };
 
   /*
   * returns true if the game object wants to 
@@ -66,7 +66,7 @@ yarn.plant = (function(){
   GameObject.prototype.is_position_dirty = function() {
     var game_object = this;
     return game_object._is_position_dirty;
-  }
+  };
 
   /*
   * returns true if the game object wants to 
@@ -75,7 +75,7 @@ yarn.plant = (function(){
   GameObject.prototype.is_velocity_dirty = function() {
     var game_object = this;
     return game_object._is_velocity_dirty;
-  }
+  };
 
   /*
   * Tell the game object to update it's box2d body's coordinate position.
@@ -85,7 +85,7 @@ yarn.plant = (function(){
     var game_object = this;
     game_object.body.SetPosition( 
         new b2Vec2( game_object.x, game_object.y ) );
-  }
+  };
 
   /*
   * Tell the game object to correct it's box2d body's instantaneous velocity.
@@ -95,7 +95,7 @@ yarn.plant = (function(){
     var game_object = this;
     game_object.body.SetLinearVelocity( 
         new b2Vec2( game_object.vx, game_object.vy ) );
-  }
+  };
 
   /*
   * returns true if the game object needs to be removed from the game.
@@ -105,7 +105,8 @@ yarn.plant = (function(){
   GameObject.prototype.needs_removed = function() {
     var game_object = this;
     return 0 == game_object.hp; // TODO out-of-bounds, may be "timers"? 
-  }
+  };
+
   /*
   * chainable,
   * request to update the game object's corrdinate position relative to the box2d world.
@@ -119,7 +120,7 @@ yarn.plant = (function(){
     game_object.y = y;
     game_object._is_position_dirty = true;
     return game_object;
-  }
+  };
 
   /*
   * chainable,
@@ -134,7 +135,7 @@ yarn.plant = (function(){
     game_object.vy = vy;
     game_object._is_velocity_dirty = true;
     return game_object;
-  }
+  };
 
   /*
   * chainable,
@@ -146,7 +147,21 @@ yarn.plant = (function(){
     var game_object = this;
     game_object.body_def = body_def;
     return game_object;
-  }
+  };
+
+  /*
+  * chainable,
+  * set the box2d fixture definition for this game object.
+  * The fixture def is used to determine the physical characteristics 
+  * of the box2d body representation.
+  * @param fixture_def (Box2D.Dynamics.b2FixtureDef)
+  * @return GameObject
+  */
+  GameObject.prototype.set_fixture_def = function( fixture_def ) {
+    var game_object = this;
+    game_object.fixture_def = fixture_def;
+    return game_object;
+  };
 
   /*
   * returns true if this game object needs to be added/removed from the graph,
@@ -158,7 +173,7 @@ yarn.plant = (function(){
         game_object._is_velocity_dirty    || 
         game_object._is_new               ||
         0 == game_object.hp;
-  }
+  };
 
   /*
   * Reset this game-object's various isDirty indicators
@@ -172,7 +187,23 @@ yarn.plant = (function(){
     game_object._is_position_dirty = false;
     game_object._is_velocity_dirty = false;
     game_object._is_new = false;
-  }
+  };
+
+  /*
+  * to be called by the game loop during an update,
+  * gives the game object a chance to correct itself before being drawn.
+  * 
+  * Gets overridden by Bot to handle "out-of-bounds" rules.
+  */
+  GameObject.prototype.update = function() {
+    var game_object = this; 
+    if ( game_object.is_position_dirty() ) {
+      game_object.update_body_position();
+    } 
+    if ( game_object.is_velocity_dirty() ) {
+      game_object.update_body_velocity();
+    } 
+  };
 
   //--------------------------------------------------
 
@@ -186,7 +217,7 @@ yarn.plant = (function(){
     var bot = this;
     bot.hp = hp;
     return bot;
-  }
+  };
 
   /*
   * chainable,
@@ -198,7 +229,7 @@ yarn.plant = (function(){
     var bot = this;
     bot.hp -= dmg;
     return bot;
-  }
+  };
 
   /*
   * chainable,
@@ -209,7 +240,21 @@ yarn.plant = (function(){
     var bot = this;
     bot.hp = 0;
     return bot;
-  }
+  };
+
+  /*
+  * overrides GameObject.prototype.update
+  * called before being drawn in the game loop.
+  *
+  * Bots utilize update to make sure it's velocities wrap around the world.
+  */
+  Bot.prototype.update = function() {
+    var bot = this,
+      body = this.body;
+    GameObject.prototype.update.call( bot );
+    var body_pos = body.GetPosition(); 
+    // TODO handle out of bounds...
+  };
 
   //
   // TODO it is probably inefficient to add to 
@@ -236,7 +281,8 @@ yarn.plant = (function(){
     // TODO set the bot's sprite...
 
     return bot
-        .set_body_def( plant._bot_body_def )
+        .set_body_def(    plant._bot_body_def )
+        .set_fixture_def( plant._bot_fixture_def )
         .set_position( 0, 0 )
         .set_velocity( 0, 0 )
         .set_health( 1 );
@@ -251,6 +297,21 @@ yarn.plant = (function(){
     body_def.position.x = 0;
     body_def.position.y = 0;
     return body_def;
+  }());
+
+  /*
+  * static,
+  * bots are represented as little 1 meter-square boxes.
+  * Assuming a scale of 30, this should translate to 30 x 30 pixel boxes.
+  */
+  ManufacturingPlant.prototype._bot_fixture_def = (function(){
+    var fixture_def = new b2FixtureDef(); 
+    fixture_def.density =     1.0;
+    fixture_def.friction =    0.5;  
+    fixture_def.restitution = 0.2;  
+    fixture_def.shape = new b2PolygonShape();
+    fixture_def.shape.SetAsBox( 0.5, 0.5 );
+    return fixture_def;
   }());
 
   return new ManufacturingPlant();
