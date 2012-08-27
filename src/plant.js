@@ -93,8 +93,12 @@ yarn.plant = (function(){
   */
   GameObject.prototype.update_body_velocity = function() {
     var game_object = this;
-    game_object.body.SetLinearVelocity( 
-        new b2Vec2( game_object.vx, game_object.vy ) );
+//  game_object.body.SetLinearVelocity( 
+//      new b2Vec2( game_object.vx, game_object.vy ) );
+    var body = game_object.body;
+    body.ApplyImpulse( 
+        new b2Vec2( game_object.vx, game_object.vy ),
+        new b2Vec2( body.GetPosition().x, body.GetPosition().y ));
   };
 
   /*
@@ -200,9 +204,9 @@ yarn.plant = (function(){
     if ( game_object.is_position_dirty() ) {
       game_object.update_body_position();
     } 
-    if ( game_object.is_velocity_dirty() ) {
+//  if ( game_object.is_velocity_dirty() ) {
       game_object.update_body_velocity();
-    } 
+//  } 
   };
 
   //--------------------------------------------------
@@ -248,13 +252,13 @@ yarn.plant = (function(){
   *
   * Bots utilize update to make sure it's velocities wrap around the world.
   */
-  Bot.prototype.update = function() {
-    var bot = this,
-      body = this.body;
-    GameObject.prototype.update.call( bot );
-    var body_pos = body.GetPosition(); 
-    // TODO handle out of bounds...
-  };
+//Bot.prototype.update = function() {
+//  var bot = this,
+//    body = this.body;
+//  GameObject.prototype.update.call( bot );
+//  //var body_pos = body.GetPosition(); 
+//  // TODO handle out of bounds...
+//};
 
   //
   // TODO it is probably inefficient to add to 

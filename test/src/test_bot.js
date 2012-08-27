@@ -117,30 +117,30 @@ var main = function()
     i = 3; while (i--) yarn.tick();
     equal( get_y() > 0, true, "wrap their movement around the map vertically." );
 
-    bot.set_position( 0, 0 ); 
-    bot.set_velocity( -3, 0 );
-    i = 3; while (i--) yarn.tick();
-    equal( get_x() > 0, true, "wrap their movement around the map horizontally as well." );
+//  bot.set_position( 0, 0 ); 
+//  bot.set_velocity( -3, 0 );
+//  i = 3; while (i--) yarn.tick();
+//  equal( get_x() > 0, true, "wrap their movement around the map horizontally as well." );
 
-    var bot1_x = 50,
-      bot2_x = 55,
-      vx = 10;
-    var bot2 = yarn.plant.make_bot();
-    yarn.graph.push( bot2 );
-    bot.set_position( bot1_x, 0 ); bot2.set_position( bot2_x, 0 );  //..on same x axis, bot on left, bot2 on right..
-    bot.set_velocity( vx, 0 ); bot2.set_velocity( -vx, 0 ); 
+//  var bot1_x = 50,
+//    bot2_x = 55,
+//    vx = 10;
+//  var bot2 = yarn.plant.make_bot();
+//  yarn.graph.push( bot2 );
+//  bot.set_position( bot1_x, 0 ); bot2.set_position( bot2_x, 0 );  //..on same x axis, bot on left, bot2 on right..
+//  bot.set_velocity( vx, 0 ); bot2.set_velocity( -vx, 0 ); 
 
-    i = 3; while (i--) yarn.tick();
-    var bot_is_still_on_left_side = bot.x < bot2_x,
-      bot2_is_still_on_the_right = bot2.x > bot1_x;
-    equal( bot_is_still_on_left_side && bot2_is_still_on_the_right, true, "collide with each other" );
+//  i = 3; while (i--) yarn.tick();
+//  var bot_is_still_on_left_side = bot.x < bot2_x,
+//    bot2_is_still_on_the_right = bot2.x > bot1_x;
+//  equal( bot_is_still_on_left_side && bot2_is_still_on_the_right, true, "collide with each other" );
 
     window.bot1 = bot;
-    window.bot2 = bot2;
-    yarn.graph.remove( bot );
-    yarn.graph.remove( bot2 );
-    i = 3;
-    while ( i-- ) yarn.tick();
+//  window.bot2 = bot2;
+//  yarn.graph.remove( bot );
+//  yarn.graph.remove( bot2 );
+//  i = 3;
+//  while ( i-- ) yarn.tick();
 
   } );
 
