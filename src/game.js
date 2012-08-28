@@ -249,6 +249,17 @@ yarn.CANVAS_HEIGHT = 400;
 yarn.CANVAS_WIDTH =  600;
 
 /*
+* temporary...
+*/
+yarn._setup_sandbox = function() {
+  var game = this;
+  game.graph.push( game.plant.make_bot().set_position( 20, 20 ).set_velocity( 5,  5 ) );
+  game.graph.push( game.plant.make_bot().set_position( 40, 80 ).set_velocity( 2, -1 ) );
+};
+
+//--------------------------------------------------
+
+/*
 * anonymous,
 * setup our game to run.
 */
@@ -268,6 +279,9 @@ yarn.CANVAS_WIDTH =  600;
     console.debug( "canvas:"+game.canvas );
     game.resume();
     $(document).trigger( game.EVENT_GAME_READY ); // needed for testing.
+    yarn._setup_sandbox();
   });
 }());
+
+
 
