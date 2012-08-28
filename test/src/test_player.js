@@ -38,6 +38,14 @@ var main = function()
     player.set_position( x, y );
     equal( player. x,  x, "should be able to set their x coordinate" ); 
     equal( player. y,  y, "should be able to set their y coordinate" ); 
+
+    yarn.graph.push( player );
+    yarn.tick(); yarn.tick();
+    equal( yarn.graph.contains( player ), true,  "should be pushable to the graph" ); 
+
+    yarn.graph.remove( player );
+    yarn.tick(); yarn.tick();
+    equal( yarn.graph.contains( player ),  false, "should be removable from the graph" ); 
   });
 
   test( "Players respond to keyboard input for directional control, so when you...", function(){ 
@@ -49,25 +57,25 @@ var main = function()
 
     yarn.graph.push( player );
 
-    yarn.handle_keydown( 87 );
+    yarn.handle_key( 87, true );
     yarn.tick(); yarn.tick();
     equal( player.y < y0, true, "press down on the \"w\" key it should move up." );
-    yarn.handle_keyup( 87 );
+    yarn.handle_key( 87, false );
 
-    yarn.handle_keydown( 83 );
+    yarn.handle_key( 83, true );
     yarn.tick(); yarn.tick(); yarn.tick(); yarn.tick();
     equal( player.y > y0, true, "press down on the \"s\" key it should move down." );
-    yarn.handle_keyup( 83 );
+    yarn.handle_key( 83, false );
 
-    yarn.handle_keydown( 65 );
+    yarn.handle_key( 65, true );
     yarn.tick(); yarn.tick(); 
     equal( player.x < x0, true, "press down on the \"a\" key it should move left." );
-    yarn.handle_keyup( 65 );
+    yarn.handle_key( 65, false );
 
-    yarn.handle_keydown( 68 );
+    yarn.handle_key( 68, true );
     yarn.tick(); yarn.tick(); yarn.tick(); yarn.tick(); 
     equal( player.x > x0, true, "press down on the \"d\" key it should move left." );
-    yarn.handle_keyup( 68 );
+    yarn.handle_key( 68, false );
 
     yarn.graph.remove( player );
   });
