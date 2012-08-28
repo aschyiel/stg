@@ -34,6 +34,7 @@ yarn.plant = (function(){
     game_object._is_position_dirty = false; 
   }; 
   var Bot =                function(){}; 
+  var Player =             function(){}; 
 
   GameObject.prototype.HIT_WIDTH =  32;
   GameObject.prototype.HIT_HEIGHT = 32;
@@ -189,30 +190,28 @@ yarn.plant = (function(){
     return bot;
   };
 
-  /*
-  * overrides GameObject.prototype.update
-  * called before being drawn in the game loop.
-  *
-  * Bots utilize update to make sure it's velocities wrap around the world.
-  */
-//Bot.prototype.update = function() {
-//  var bot = this,
-//    body = this.body;
-//  GameObject.prototype.update.call( bot );
-//  //var body_pos = body.GetPosition(); 
-//  // TODO handle out of bounds...
-//};
-
-  //
-  // TODO it is probably inefficient to add to 
-  // the global yarn.plant instance this way in javaScript...
-  // 
-
   //--------------------------------------------------
-  //
-  // public
-  // 
-  //--------------------------------------------------
+
+  Player.prototype.draw = function() {
+    var player = this,
+      context = yarn.context,
+      game_proto = GameObject.prototype;
+
+    context.save();
+
+    context.setTransform( 1, 0, 0, 1, 0, 0 ); // identity
+    context.fillStyle = '#FF0000';
+    context.translate( player.x, player.y );
+    context.fillRect( 
+        -game_proto.HALF_HIT_WIDTH,
+        -game_proto.HALF_HIT_HEIGHT,
+         game_proto.HIT_WIDTH,
+         game_proto.HIT_HEIGHT );
+   
+    context.restore(); 
+  }
+
+  //-------------------------------------------------- 
 
   /**
   * @public
@@ -228,6 +227,26 @@ yarn.plant = (function(){
     // TODO set the bot's sprite...
 
     return bot
+        .set_position( 0, 0 )
+        .set_velocity( 0, 0 )
+        .set_health( 1 );
+  }; 
+
+  /**
+  * @public
+  * Generate a player game object.
+  * @return player
+  */
+  ManufacturingPlant.prototype.make_player = function() {
+    var plant = this;
+    var player = $.extend( {}, 
+        new GameObject, 
+        new Bot,
+        new Player ); 
+
+    // TODO set the bot's sprite...
+
+    return player
         .set_position( 0, 0 )
         .set_velocity( 0, 0 )
         .set_health( 1 );
