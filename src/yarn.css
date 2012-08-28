@@ -21,11 +21,14 @@
 */
 
 canvas.yarn {
+/*  
   width: 600px;
   height: 400px;
+  */
   border-color: black;
   border-style: solid;
   border-width: 4px;
+  display: block;
 }
 
 

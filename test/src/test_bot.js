@@ -31,7 +31,8 @@ var main = function()
   configure_yarn_for_testing(); 
 
   test( "Bots are constructable and", function(){
-    var bot = yarn.plant.make_bot();
+    var bot = yarn.plant.make_bot().set_position( 30, 30 );
+    bot.draw();
     equal( bot._is_new, true, "should be marked as \"new\" for the grapher." );
     equal( bot.is_dirty(), true, "should be flagged as \"dirty\" for the grapher so it knows to do something with it when it is added." );
     equal( !!bot, true, "should be generated via yarn.plant.make_bot()." );
@@ -42,9 +43,10 @@ var main = function()
     equal( yarn.graph.contains( bot ), true, "should be added to the game world via yarn.graph.push()." ); 
     i = 3;
     while ( i-- ) yarn.tick();
-    yarn.graph.remove( bot );
-    i = 3;
-    while ( i-- ) yarn.tick();
+//  yarn.graph.remove( bot );
+//  i = 3;
+//  while ( i-- ) yarn.tick();
+    window.bot = bot;
   });
 
   test( "Bots are destructable and", function(){

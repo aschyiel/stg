@@ -56,6 +56,30 @@ yarn.graph = (function(){
 
   /**
   * @public
+  * Draw the graph's displayList, animating all of the game objects.
+  * This does NOT change any of the game-objects positions/velocities/etc.
+  */
+  GameGraph.prototype.draw = function() {
+    var graph = this;
+    var i = 0,
+      model = graph._game_objects,
+      len = graph._game_objects.length,
+      game_object;
+
+    for ( ; i < len; i++ ) {
+      game_object = model[ i ]; 
+
+      // skip items that don't need our attention.
+      if ( null === game_object ) {
+        continue;
+      } 
+
+      game_object.draw();   // TODO this is wrong if removed/killed.
+    } 
+  }
+
+  /**
+  * @public
   * update the game object graph;
   * animate stuff,
   * apply position/velocity changes,
@@ -67,13 +91,12 @@ yarn.graph = (function(){
   * @param dt - the time-step in msec representing the animation-frame elapsed time.
   * @return void
   */
-  GameGraph.prototype.update = function( dt ) {
+  GameGraph.prototype.update_world = function( dt ) {
     var graph = this;
     var i = 0, 
       model = graph._game_objects,
       len = graph._game_objects.length,
-      game_object,
-      body;
+      game_object;
 
     for ( ; i < len; i++ ) {
       game_object = model[ i ]; 
@@ -84,7 +107,6 @@ yarn.graph = (function(){
       } 
 
       game_object.update(); 
-      game_object.draw();   // TODO this is wrong if removed/killed.
 
       // skip items that don't need our attention. (x2)
       if ( !game_object.is_dirty() ) {
@@ -185,8 +207,7 @@ yarn.graph = (function(){
   */
   GameGraph.prototype._insert_game_object = function( item, index ) {
     var graph = this,
-      model = this._game_objects,
-      body; 
+      model = this._game_objects;
 
     if ( null !== index ) {
       model[ index ] = item; 

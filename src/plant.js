@@ -34,38 +34,34 @@ yarn.plant = (function(){
     game_object._is_position_dirty = false; 
   }; 
   var Bot =                function(){}; 
- 
+
+  GameObject.prototype.HIT_WIDTH =  32;
+  GameObject.prototype.HIT_HEIGHT = 32;
+  GameObject.prototype.HALF_HIT_WIDTH =  GameObject.prototype.HIT_WIDTH / 2;
+  GameObject.prototype.HALF_HIT_HEIGHT = GameObject.prototype.HIT_HEIGHT / 2;
+
   /*
-  * Render the gameobject onto the canvas.
+  * Render the gameobject onto the canvas,
+  * by default draws a little box centered around the game-object's coordinates.
   */
   GameObject.prototype.draw = function() {
-    var game_object = this;
-    // TODO
+    var game_object = this,
+      context = yarn.context,
+      proto = GameObject.prototype;
+
+    context.save();
+
+    context.setTransform( 1, 0, 0, 1, 0, 0 ); // identity
+    context.fillStyle = '#000000';
+    context.translate( game_object.x, game_object.y );
+    context.fillRect( 
+        -proto.HALF_HIT_WIDTH,
+        -proto.HALF_HIT_HEIGHT,
+        proto.HIT_WIDTH,
+        proto.HIT_HEIGHT );
+   
+    context.restore(); 
   }; 
-
-  /*
-  * Tell the game object to update it's box2d body's coordinate position.
-  * To be called by the grapher during it's update cycle.
-  */
-  GameObject.prototype.update_body_position = function() {
-    var game_object = this;
-    game_object.body.SetPosition( 
-        new b2Vec2( game_object.x, game_object.y ) );
-  };
-
-  /*
-  * Tell the game object to correct it's box2d body's instantaneous velocity.
-  * To be called by the grapher during it's update cycle.
-  */
-  GameObject.prototype.update_body_velocity = function() {
-    var game_object = this;
-//  game_object.body.SetLinearVelocity( 
-//      new b2Vec2( game_object.vx, game_object.vy ) );
-    var body = game_object.body;
-    body.ApplyImpulse( 
-        new b2Vec2( game_object.vx, game_object.vy ),
-        new b2Vec2( body.GetPosition().x, body.GetPosition().y ));
-  };
 
   /*
   * returns true if the game object needs to be removed from the game.

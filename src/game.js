@@ -57,6 +57,8 @@ yarn = (function(){
     // the current frames per second we are running at.
     // for testing purposes.
     game.fps = 0; 
+
+    game._are_all_keys_up = true;
   }; 
   return new YarnGame();
 })();
@@ -130,7 +132,7 @@ yarn.update_stats = function( delta ) {
   var game = yarn;
   var fps = game.round( 1000 / delta );
   game.fps = fps; // used in testing to verify game loop is running.
-  console.debug( "fps:"+fps );  // TODO draw this...
+//console.debug( "fps:"+fps );  // TODO draw this...
 };
 
 /*
@@ -154,7 +156,10 @@ yarn.run = function( timestamp ) {
   }
   var delta_time = timestamp - game._timestamp;
   game.update_stats( delta_time ); 
-//game.tick( delta_time );
+  game.graph.draw();
+  if ( !game._are_all_keys_up ) { 
+    game.tick();
+  } 
   game._timestamp = new Date();
   window.requestAnimationFrame( game.run );
 }; 
@@ -173,8 +178,15 @@ yarn.tick = function( dt ) {
     return;
   }
 
-  yarn.graph.update( dt ); 
+  yarn.graph.update_world( dt ); 
 }; 
+
+/*
+* Holds the current keyboard state,
+* true represents keydown.,
+* and false repsents keyup.
+*/
+yarn._keys = [];
 
 /*
 * the game's keydown handler.
@@ -186,8 +198,55 @@ yarn.tick = function( dt ) {
 * Thus giving the player time to think their next move out.
 */
 yarn.handle_keydown = function( event ) {
-  console.debug( "keydown event:"+event ); 
-} 
+  var game = yarn;
+  console.debug( "keydown event.keyCode:"+event.keyCode ); 
+  switch ( event.keyCode ) {
+    case 32:  /* spaceBar */
+    case 65:  /* a */
+    case 68:  /* d */
+    case 80:  /* "p" */
+    case 83:  /* s */
+    case 87:  /* w */ 
+      yarn._keys[ event.keyCode ] = true;
+      game._are_all_keys_up = false;
+      break; 
+    default:
+      break;
+  } 
+}; 
+
+yarn.handle_keyup = function( event ) {
+  var game = yarn;
+  switch ( event.keyCode ) {
+    case 32:  /* spaceBar */
+    case 65:  /* a */
+    case 68:  /* d */
+    case 80:  /* "p" */
+    case 83:  /* s */
+    case 87:  /* w */
+      yarn._keys[ event.keyCode ] = false;
+      break; 
+    default:
+      break;
+  } 
+  var are_up = true,
+    keys = yarn._keys;
+  are_up = are_up || keys[ 32 ]; 
+  are_up = are_up || keys[ 65 ]; 
+  are_up = are_up || keys[ 68 ]; 
+  are_up = are_up || keys[ 80 ]; 
+  are_up = are_up || keys[ 83 ]; 
+  are_up = are_up || keys[ 87 ]; 
+
+  game._are_all_keys_up = are_up;
+};
+
+yarn.handle_click = function( event ) {
+  console.debug( "click, \"X\":"+event.offsetX+", \"Y\":"+event.offsetY );
+};
+
+yarn.CANVAS_HEIGHT = 400;
+yarn.CANVAS_WIDTH =  600;
 
 /*
 * anonymous,
@@ -197,8 +256,15 @@ yarn.handle_keydown = function( event ) {
   var game = yarn;
   $(document).ready(function(){
     console.debug( "setting up yarn, and kick-starting the game loop." );
-    game.canvas = $( 'canvas.yarn' )[0];
-    $( game.canvas ).keydown( yarn.handle_keydown );
+    var $canvas = $( 'canvas.yarn' );
+    var $doc = $(document);
+    $doc.keydown( function(e) { yarn.handle_keydown( e ) } );  // TODO only listen to 
+    $doc.keyup(   function(e) { yarn.handle_keyup(   e ) } );  // canvas's key events..
+    $doc.click(   function(e) { yarn.handle_click(   e ) } );  
+    game.canvas = $canvas[0];
+    game.canvas.height = yarn.CANVAS_HEIGHT;
+    game.canvas.width =  yarn.CANVAS_WIDTH;
+    game.context = game.canvas.getContext( "2d" );
     console.debug( "canvas:"+game.canvas );
     game.resume();
     $(document).trigger( game.EVENT_GAME_READY ); // needed for testing.
