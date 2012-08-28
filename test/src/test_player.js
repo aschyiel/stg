@@ -24,7 +24,7 @@
 var main = function()
 { 
   console.debug( "test_player start." );
-  yarn.pause();
+//yarn.pause();
 
   test( "Players for the most part behave like every other game object and they", function(){
 
@@ -35,22 +35,56 @@ var main = function()
       y = 12,
       vx = 14,
       vy = 16; 
-    player.set_position( x, y ).set_velocity( vx, vy ); 
+    player.set_position( x, y );
     equal( player. x,  x, "should be able to set their x coordinate" ); 
     equal( player. y,  y, "should be able to set their y coordinate" ); 
-    equal( player.vx, vx, "should be able to set their x velocity" ); 
-    equal( player.vy, vy, "should be able to set their y velocity" ); 
-
-    yarn.graph.push( player ); 
-
-    window.player = player;
   });
 
+  test( "Players respond to keyboard input for directional control, so when you...", function(){ 
+
+    var player = yarn.plant.make_player();
+    var x0 = 100, 
+      y0 = 100; 
+    player.set_position( x0, y0 );
+
+    yarn.graph.push( player );
+
+    yarn.handle_keydown( 87 );
+    yarn.tick(); yarn.tick();
+    equal( player.y < y0, true, "press down on the \"w\" key it should move up." );
+    yarn.handle_keyup( 87 );
+
+    yarn.handle_keydown( 83 );
+    yarn.tick(); yarn.tick(); yarn.tick(); yarn.tick();
+    equal( player.y > y0, true, "press down on the \"s\" key it should move down." );
+    yarn.handle_keyup( 83 );
+
+    yarn.handle_keydown( 65 );
+    yarn.tick(); yarn.tick(); 
+    equal( player.x < x0, true, "press down on the \"a\" key it should move left." );
+    yarn.handle_keyup( 65 );
+
+    yarn.handle_keydown( 68 );
+    yarn.tick(); yarn.tick(); yarn.tick(); yarn.tick(); 
+    equal( player.x > x0, true, "press down on the \"d\" key it should move left." );
+    yarn.handle_keyup( 68 );
+
+    yarn.graph.remove( player );
+  });
+
+//yarn.resume();
+//yarn.resume();
+
+  setup_sandbox_player();
+} 
+
+var setup_sandbox_player = function() {
+  var player = yarn.plant.make_player();
+  yarn.graph.push( player ); 
+  window.player = player;
 
   yarn.graph.update_world();
-  yarn.graph.draw();
-  yarn.resume();
-  yarn.resume();
-} 
+  yarn.graph.draw(); 
+}
 
 $(document).on( yarn.EVENT_GAME_READY, main ); 

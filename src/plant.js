@@ -209,7 +209,39 @@ yarn.plant = (function(){
          game_proto.HIT_HEIGHT );
    
     context.restore(); 
-  }
+  };
+
+  /* static, the amount of units to advance per axis of direction. */
+  Player.prototype.SPEED = 5;
+
+  /*
+  * Player overrides game-object's update;
+  * allows the user to conduct keyboard control over movement.
+  */
+  Player.prototype.update = function() {
+    var player = this,
+      speed = Player.prototype.SPEED; 
+    
+    var keys = yarn._keys,
+      dx = 0,
+      dy = 0; 
+
+    if ( keys[ 87 ] && !keys[ 83 ] ) {
+      dy -= speed;  // pressed "w", move up.
+    } else if ( !keys[ 87 ] && keys[ 83 ] ) {
+      dy += speed;  // pressed "s", move down.  
+    }
+
+    if ( keys[ 65 ] && !keys[ 68 ] ) {
+      dx -= speed;  // pressed "a", move left.
+    } else if ( !keys[ 65 ] && keys[ 68 ] ) { 
+      dx += speed;  // pressed "d", move right.
+    }
+
+    player.x += dx;
+    player.y += dy;
+    GameObject.prototype.update.call( player ); 
+  }; 
 
   //-------------------------------------------------- 
 

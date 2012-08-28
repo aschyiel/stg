@@ -57,8 +57,6 @@ yarn = (function(){
     // the current frames per second we are running at.
     // for testing purposes.
     game.fps = 0; 
-
-    game._are_all_keys_up = true;
   }; 
   return new YarnGame();
 })();
@@ -77,7 +75,7 @@ yarn.EVENT_GAME_READY = "YARN_EVENT_GAME_READY";
   window.requestAnimationFrame = requestAnimationFrame;
 })();
 
-//--------------------------------------------------
+//-------------------------------------------------- 
 
 /**
 * @public
@@ -132,7 +130,6 @@ yarn.update_stats = function( delta ) {
   var game = yarn;
   var fps = game.round( 1000 / delta );
   game.fps = fps; // used in testing to verify game loop is running.
-//console.debug( "fps:"+fps );  // TODO draw this...
 };
 
 /*
@@ -156,10 +153,11 @@ yarn.run = function( timestamp ) {
   }
   var delta_time = timestamp - game._timestamp;
   game.update_stats( delta_time ); 
-  game.graph.draw();
-  if ( !game._are_all_keys_up ) { 
+  if ( game.has_keys_down() ) {   // TODO this is glitchy with this if statement...
     game.tick();
   } 
+
+  game.graph.draw();
   game._timestamp = new Date();
   window.requestAnimationFrame( game.run );
 }; 
@@ -167,18 +165,16 @@ yarn.run = function( timestamp ) {
 /*
 * animate our game for a single cycle/animation-frame;
 * Because this is a separate function from yarn.run, it simplifies unit testing.
-* @param dt - delta time in msec.
 * @return void
 */
-yarn.tick = function( dt ) {
-  console.debug( "..yarn.tick.." );
+yarn.tick = function() {
   var yarn = this;
-  if ( !yarn.graph ) {
-    console.warn( "graph is not ready yet, ignoring tick request. Try using the EVENT_GAME_READY event?" );
-    return;
-  }
+//if ( !yarn.graph ) {
+//  console.warn( "graph is not ready yet, ignoring tick request. Try using the EVENT_GAME_READY event?" );
+//  return;
+//}
 
-  yarn.graph.update_world( dt ); 
+  yarn.graph.update_world(); 
 }; 
 
 /*
@@ -186,7 +182,7 @@ yarn.tick = function( dt ) {
 * true represents keydown.,
 * and false repsents keyup.
 */
-yarn._keys = [];
+yarn._keys = {};
 
 /*
 * the game's keydown handler.
@@ -198,47 +194,39 @@ yarn._keys = [];
 * Thus giving the player time to think their next move out.
 */
 yarn.handle_keydown = function( event ) {
-  var game = yarn;
-  console.debug( "keydown event.keyCode:"+event.keyCode ); 
-  switch ( event.keyCode ) {
-    case 32:  /* spaceBar */
-    case 65:  /* a */
-    case 68:  /* d */
-    case 80:  /* "p" */
-    case 83:  /* s */
-    case 87:  /* w */ 
-      yarn._keys[ event.keyCode ] = true;
-      game._are_all_keys_up = false;
-      break; 
-    default:
-      break;
-  } 
+  yarn.handle_key( event.keyCode, true );
 }; 
-
 yarn.handle_keyup = function( event ) {
+  yarn.handle_key( event.keyCode, false );
+}; 
+yarn.handle_key = function( key_code, is_down ) {
   var game = yarn;
-  switch ( event.keyCode ) {
-    case 32:  /* spaceBar */
+  var keys = game._keys;
+  switch ( key_code ) {
+    case 87:  /* w */ 
+    case 83:  /* s */
     case 65:  /* a */
     case 68:  /* d */
     case 80:  /* "p" */
-    case 83:  /* s */
-    case 87:  /* w */
-      yarn._keys[ event.keyCode ] = false;
+    case 32:  /* spaceBar */ 
+      keys[ key_code ] = is_down;
       break; 
     default:
       break;
   } 
-  var are_up = true,
-    keys = yarn._keys;
-  are_up = are_up || keys[ 32 ]; 
-  are_up = are_up || keys[ 65 ]; 
-  are_up = are_up || keys[ 68 ]; 
-  are_up = are_up || keys[ 80 ]; 
-  are_up = are_up || keys[ 83 ]; 
-  are_up = are_up || keys[ 87 ]; 
+}
 
-  game._are_all_keys_up = are_up;
+/*
+* returns true if any of the player control keys are pressed down.
+*/
+yarn.has_keys_down = function() {
+  var keys = yarn._keys;
+  return keys[ 87 ] || 
+   keys[ 65 ] || 
+   keys[ 68 ] ||
+   keys[ 83 ] ||
+   keys[ 32 ] ||
+   keys[ 80 ]; 
 };
 
 yarn.handle_click = function( event ) {
