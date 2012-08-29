@@ -32,6 +32,9 @@ yarn.plant = (function(){
     var game_object = this;
     game_object._is_new = true;
     game_object._is_position_dirty = false; 
+
+    /* angle of rotation in radians (0 means "right" just like in the html5 canvas). */
+    game_object.theta = 0;
   }; 
   var Bot =                function(){}; 
   var Player =             function(){}; 
@@ -192,10 +195,32 @@ yarn.plant = (function(){
 
   //--------------------------------------------------
 
+  /*
+  * handle player rotation based on our mouse coordinates,
+  * to be called before rendering (allows user to explore different angles).
+  */ 
+  Player.prototype.calculate_rotation = function() {
+    var game = yarn,
+      player = this;
+    var x1 = player.x,
+      y1 = player.y,
+      x2 = game.mouse_x,
+      y2 = game.mouse_y,
+      dx, dy; 
+
+    if ( x2 == -1 || y2 == -1 ) {
+      return; //..no rotation specified yet..
+    }
+    dx = x2 - x1;
+    dy = y2 - y1; 
+    player.theta = -Math.atan2( dx, dy ); 
+  };
+
   Player.prototype.draw = function() {
     var player = this,
       context = yarn.context,
-      game_proto = GameObject.prototype;
+      game_proto = GameObject.prototype; 
+    player.calculate_rotation();
 
     context.save();
 
@@ -203,7 +228,15 @@ yarn.plant = (function(){
     context.strokeStyle = '#00FF00';
     context.translate( 
             player.x - game_proto.HALF_HIT_WIDTH, 
-            player.y - game_proto.HALF_HIT_HEIGHT ); // Offset so it centers on our player.
+            player.y - game_proto.HALF_HIT_HEIGHT ); // start drawing at the player's coordinates.
+
+    var theta_offset = 1.57; // 90 degress offset in radians (due to html5 canvas).
+    context.rotate( player.theta + theta_offset ); 
+
+    context.translate( 
+            -game_proto.HALF_HIT_WIDTH, 
+            -game_proto.HALF_HIT_HEIGHT ); //..draw based off center of rotation..
+
 
     context.beginPath();
     context.moveTo( 0, 0 );   context.lineTo( 32, 16 );
@@ -213,6 +246,7 @@ yarn.plant = (function(){
     context.closePath();
     context.stroke(); 
    
+
     context.restore(); 
   };
 
@@ -225,9 +259,10 @@ yarn.plant = (function(){
   */
   Player.prototype.update = function() {
     var player = this,
-      speed = Player.prototype.SPEED; 
+      speed = Player.prototype.SPEED,
+      game = yarn; 
     
-    var keys = yarn._keys,
+    var keys = game._keys,
       dx = 0,
       dy = 0; 
 

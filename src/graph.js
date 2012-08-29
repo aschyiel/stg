@@ -65,6 +65,7 @@ yarn.graph = (function(){
       model = graph._game_objects,
       len = graph._game_objects.length,
       game_object; 
+    graph.clear_canvas();
 
     for ( ; i < len; i++ ) {
       game_object = model[ i ]; 
@@ -77,6 +78,12 @@ yarn.graph = (function(){
       game_object.draw();   // TODO this is wrong if removed/killed.
     } 
   }; 
+
+  GameGraph.prototype.clear_canvas = function() {
+    var context = yarn.context;
+    context.fillStyle = '#ffffff';
+    context.fillRect( 0, 0, yarn.CANVAS_WIDTH, yarn.CANVAS_HEIGHT );
+  };
 
   /**
   * @public

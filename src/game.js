@@ -233,6 +233,13 @@ yarn.handle_click = function( event ) {
   console.debug( "click, \"X\":"+event.offsetX+", \"Y\":"+event.offsetY );
 };
 
+yarn.mouse_x = -1;
+yarn.mouse_y = -1;
+yarn.handle_mousemove = function( event ) {
+  yarn.mouse_x = event.offsetX; 
+  yarn.mouse_y = event.offsetY;
+};
+
 yarn.CANVAS_HEIGHT = 400;
 yarn.CANVAS_WIDTH =  600;
 
@@ -260,6 +267,7 @@ yarn._setup_sandbox = function() {
     $doc.keydown( function(e) { yarn.handle_keydown( e ) } );  // TODO only listen to 
     $doc.keyup(   function(e) { yarn.handle_keyup(   e ) } );  // canvas's key events..
     $doc.click(   function(e) { yarn.handle_click(   e ) } );  
+    $doc.mousemove( function(e) { yarn.handle_mousemove( e ) } );  
     game.canvas = $canvas[0];
     game.canvas.height = yarn.CANVAS_HEIGHT;
     game.canvas.width =  yarn.CANVAS_WIDTH;
