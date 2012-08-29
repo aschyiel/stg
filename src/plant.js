@@ -200,13 +200,18 @@ yarn.plant = (function(){
     context.save();
 
     context.setTransform( 1, 0, 0, 1, 0, 0 ); // identity
-    context.fillStyle = '#FF0000';
-    context.translate( player.x, player.y );
-    context.fillRect( 
-        -game_proto.HALF_HIT_WIDTH,
-        -game_proto.HALF_HIT_HEIGHT,
-         game_proto.HIT_WIDTH,
-         game_proto.HIT_HEIGHT );
+    context.strokeStyle = '#00FF00';
+    context.translate( 
+            player.x - game_proto.HALF_HIT_WIDTH, 
+            player.y - game_proto.HALF_HIT_HEIGHT ); // Offset so it centers on our player.
+
+    context.beginPath();
+    context.moveTo( 0, 0 );   context.lineTo( 32, 16 );
+    context.moveTo( 0, 32 );  context.lineTo( 32, 16 );
+    context.moveTo( 4, 2 ); context.lineTo( 4, 30 );
+    context.moveTo( 8, 4 ); context.lineTo( 8, 28 );
+    context.closePath();
+    context.stroke(); 
    
     context.restore(); 
   };
