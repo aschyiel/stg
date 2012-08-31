@@ -38,6 +38,10 @@ yarn.plant = (function(){
   }; 
   var Bot =                function(){}; 
   var Bacteria =           function(){}; 
+  var Lot =                function() {
+    var lot = this; 
+    lot._neighbors = [];
+  }; 
   var Player =             function(){}; 
 
   /* The default amount of movement-units to travel in a single tick. */
@@ -222,6 +226,31 @@ yarn.plant = (function(){
   Bacteria.prototype.HALF_HIT_HEIGHT = 2;
 
   /*
+  * Elucidate a bacterium's intentions to run farther or shorter 
+  * with a given lot of space/chemical-signatures.
+  *
+  * In yarn, I've decided that bugs want outweigh eating over danger, 
+  * followed by the threat of over-population.
+  * Do certain flavours of bacterium vary in their choices?
+  *
+  * @param lot - (Lot) an area of space.
+  * @return int - Bacterial sense of directionality (ie. CORRECT_DIRECTION ).
+  */
+  Bacteria.prototype.determine_intent = function( lot ) {
+    var bug = this; 
+    if ( lot.is_bountiful() ) {
+      return bug.CORRECT_DIRECTION;
+    } 
+    if ( lot.is_dangerous() ) {
+      return bug.WRONG_DIRECTION;
+    }
+    if ( lot.is_overcrowded() ) {
+      return bug.WRONG_DIRECTION;
+    } 
+    return bug.NEUTRAL_DIRECTION;
+  };
+
+  /*
   * chainable,
   * animated,
   * Tell the bacteria to tumble and change their rotational-direction randomly.
@@ -305,8 +334,139 @@ yarn.plant = (function(){
     c.stroke(); 
 
     context.restore(); 
+  }; 
+
+  /** 
+  * @public
+  * Bacteria game-lot setter/getter, 
+  * associates a bacterium with a plotted chemical-signal area.
+  */
+  Bacteria.prototype.set_lot = function( lot ) {
+    var bug = this;
+    bug._lot = lot;
+  };
+  Bacteria.prototype.get_lot = function() {
+    var bug = this;
+    return bug._lot;
   };
 
+  /*
+  * Kill a bacterium, and mark it's surrounding area as dangerous to other bacterium.
+  * overrides Bot.kill.
+  * @return void
+  */
+  Bacteria.prototype.kill = function() {
+    var bug = this,
+        lot = this.get_lot();
+    lot.mark_dangerous();
+    Bot.prototype.kill.call( bug ); 
+  }
+
+  //--------------------------------------------------
+
+  /* Percentage decay of signal values per tick. */
+  Lot.prototype.SIGNAL_DECAY = 0.5;
+
+  /* How much signal units get added when marking something on a lot. */
+  Lot.prototype.SIGNAL_FACTOR = 10;
+
+  /* The maximum number of times a signal can be passed-on/re-told between neighbors. */
+  Lot.prototype.MAX_RETELLINGS = 4; 
+
+  /* 
+  * The minimum chemical signal level to register a truth about a lot. 
+  * note: should be greater than zero due to the nature of decay 
+  * only approaching but never quite reaching zero.
+  */
+  Lot.prototype.MINIMUM_SIGNAL = 1.5; 
+
+  /* Clear a lot's chemical signals; Effectively proclaiming a lot as being "neutral". */
+  Lot.prototype.clear_signals = function() {
+    var lot = this;
+    lot._danger_level =     0;
+    lot._population_level = 0;
+    lot._resource_level =   0;
+  } 
+
+  /*
+  * semi-recursive,
+  * Mark an area as dangerous and let the neighboring lots know that they are thereby indangered too.
+  * @return void
+  */
+  Lot.prototype.mark_dangerous = function() {
+    var lot = this;
+    lot.mark_signal( "_danger_level" );
+  }
+
+  /*
+  * semi-recursive,
+  * Mark an area as bountiful and full of resources. 
+  * Passes the message along to surrounding neighbors as well.
+  * @return void
+  */ 
+  Lot.prototype.mark_bountiful = function() {
+    var lot = this;
+    lot.mark_signal( "_resource_level" );
+  }
+
+  /*
+  * semi-recursive,
+  * Flag an lot area as being over-crowded (with bacteria).
+  * This message is passed-along to surrounding neighbor lots.
+  * @return void
+  */ 
+  Lot.prototype.mark_crowded = function() {
+    var lot = this;
+    lot.mark_signal( "_population_level" );
+  }
+
+  /*
+  * @private
+  * semi-recursive,
+  * Pass on a chemical signal to the lot and it's surrounding neighbors.
+  * @param message_attribute (string) the chemical message to pass on (Lot property to add to).
+  * @param retellings (int) the number of times the "mark-as-dangerous" message has been passed on.
+  *                   Defaults to 0.  
+  * @return void
+  */ 
+  Lot.prototype.mark_signal = function( message_attribute, retellings ) {
+    var lot = this;
+    retellings = retellings || 1; 
+    if ( retellings > lot.MAX_RETELLINGS ) {
+      return;
+    }
+
+    var signal_strength = lot.SIGNAL_FACTOR / retellings;
+    lot[ message_attribute ] += signal_strength;
+
+    // 
+    // psst, pass it on...
+    //
+    retellings++;
+    $.each( lot._neighbors, function( index, neighbor ) {
+      neighbor.mark_signal( message_attribute, retellings ); 
+    } );
+  }; 
+
+  /*
+  * returns true if the lot is flagged with too many danger signals.
+  */
+  Lot.prototype.is_dangerous = function() {
+    var lot = this;
+    return lot._danger_level > lot.MINIMUM_SIGNAL;
+  }
+
+  Lot.prototype.is_overcrowded = function() {
+    var lot = this;
+    return lot._population_level > lot.MINIMUM_SIGNAL;
+  }
+
+  Lot.prototype.is_bountiful = function() {
+    var lot = this;
+    return lot._resource_level > lot.MINIMUM_SIGNAL;
+  } 
+
+  // TODO allow setting neighboring lots in the graph?...
 
   //--------------------------------------------------
 
@@ -455,6 +615,19 @@ yarn.plant = (function(){
         .set_velocity( 0, 0 )
         .set_health( 1 );
   }; 
+
+  /**
+  * @public
+  * Generate a lot of area.  Lots convey "chemical-signal" information within an area, 
+  * and are used by game-objects such as bacteria to communicate/think.
+  * @return Lot
+  */
+  ManufacturingPlant.prototype.make_lot = function() {
+    var plant = this;
+    var lot = $.extend( {}, new Lot ); 
+    lot.clear_signals();
+    return lot;
+  };
 
   return new ManufacturingPlant();
 })();

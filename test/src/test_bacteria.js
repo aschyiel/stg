@@ -89,11 +89,31 @@ var main = function()
     equal( normal_run_distance < get_d(), true, "should run more if they are going in the right direction." ); 
   }); 
 
-  test( "Bacteria can sense their immediate environment, and they", function(){
-    expect(3);
-    equal( false, true, "should move away from danger." );
-    equal( false, true, "should move towards resources." );
-    equal( false, true, "should try to move away from each other and spread out." );
+  test( "Bacteria can sense/communicate chemical signals within their immediate environment, and they", function(){
+    expect(4);
+
+    var bug = yarn.plant.make_bacteria();
+    var lot = yarn.plant.make_lot(); 
+    lot.mark_dangerous();
+ 
+    equal( bug.determine_intent( lot ), bug.WRONG_DIRECTION, 
+        "should try to move away from danger." );
+
+    lot.clear_signals();
+    lot.mark_bountiful(); 
+    equal( bug.determine_intent( lot ), bug.CORRECT_DIRECTION, 
+        "should try to move towards resources." );
+
+    lot.clear_signals();
+    lot.mark_crowded(); 
+    equal( bug.determine_intent( lot ), bug.WRONG_DIRECTION, 
+        "should try to move away from each other and spread out." );
+
+    lot.clear_signals();
+    bug.set_lot( lot );
+    bug.kill();
+    equal( lot.is_dangerous(), true, 
+        "should let other bacteria know that an area is dangerous on death." );
   }); 
 
   test( "Bacteria reproduce via binary-fission, and they", function(){
