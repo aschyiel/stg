@@ -37,7 +37,11 @@ yarn.plant = (function(){
     game_object.theta = 0;
   }; 
   var Bot =                function(){}; 
+  var Bacteria =           function(){}; 
   var Player =             function(){}; 
+
+  /* The default amount of movement-units to travel in a single tick. */
+  GameObject.prototype.SPEED =  5;
 
   GameObject.prototype.HIT_WIDTH =  32;
   GameObject.prototype.HIT_HEIGHT = 32;
@@ -195,6 +199,98 @@ yarn.plant = (function(){
 
   //--------------------------------------------------
 
+  /* Indicate that the bug is currently experiencing a "tumble". */
+  Bacteria.prototype.IS_TUMBLING = 10;
+
+  /* Indicate that the bug is currently "running". */
+  Bacteria.prototype.IS_RUNNING = 20;
+
+  /* Indicate that the bug is currently reproducing and undergoing binary fission. */
+  Bacteria.prototype.IS_REPRODUCING = 30; 
+  
+  Bacteria.prototype.HIT_WIDTH =       8;
+  Bacteria.prototype.HIT_HEIGHT =      4;
+  Bacteria.prototype.HALF_HIT_WIDTH =  4;
+  Bacteria.prototype.HALF_HIT_HEIGHT = 2;
+
+  /*
+  * chainable,
+  * animated,
+  * Tell the bacteria to tumble and change their rotational-direction randomly.
+  * To simplify testing, bacteria will never choose the same direction twice in a row.
+  * @return Bacteria.
+  */
+  Bacteria.prototype.tumble = function() {
+    var bug = this;
+    bug.animation = bug.IS_TUMBLING;
+    var theta = bug.theta;
+    while ( theta == bug.theta ) {
+      bug.theta = Math.random() * 2 * Math.PI;
+    }
+    return bug;
+  };
+
+  /*
+  * chainable,
+  * animated,
+  * Tell the bacteria to start running in the currently selected direction.
+  * Based on how "correct" the current direction is, determines how far the bacteria will run.
+  *
+  * In biology, the distance bacteria will run is determined by the concentration 
+  * of chemical signals in the immediate area (chemotaxis). 
+  *
+  * @return Bacteria
+  */
+  Bacteria.prototype.run = function( intent ) {
+    var bug = this,
+        theta = this.theta,
+        distance = this.SPEED; 
+    bug.animation = bug.IS_RUNNING;
+
+    bug.x += ( distance * Math.sin( theta ) );
+    bug.y += ( distance * Math.cos( theta ) );
+
+    return bug;
+  };
+
+  /*
+  * Draw the bacteria.
+  * TODO animate based on the bacteria's states of tumbling, running, or reproducing.
+  */
+  Bacteria.prototype.draw = function() {
+    var bug = this,
+      context = yarn.context; 
+    context.save();
+
+    context.setTransform( 1, 0, 0, 1, 0, 0 ); 
+    context.strokeStyle = '#0000FF';
+    context.translate( 
+            bug.x - bug.HALF_HIT_WIDTH, 
+            bug.y - bug.HALF_HIT_HEIGHT ); 
+
+    var theta_offset = 1.57; // 90 degress offset in radians (due to html5 canvas).
+    context.rotate( bug.theta + theta_offset ); 
+    context.translate( 
+            -bug.HALF_HIT_WIDTH, 
+            -bug.HALF_HIT_HEIGHT ); 
+
+    var c = context;
+    c.beginPath();
+    c.moveTo( 0, 0 ); c.lineTo( 8, 0 );
+    c.moveTo( 8, 0 ); c.lineTo( 8, 4 );
+    c.moveTo( 8, 4 ); c.lineTo( 0, 4 );
+    c.moveTo( 0, 4 ); c.lineTo( 0, 0 );
+    c.moveTo( 1, 0 ); c.lineTo( 1, 4 );
+    c.moveTo( 7, 0 ); c.lineTo( 7, 4 );
+    c.closePath();
+    c.stroke(); 
+
+    context.restore(); 
+  };
+
+
+  //--------------------------------------------------
+
   /*
   * handle player rotation based on our mouse coordinates,
   * to be called before rendering (allows user to explore different angles).
@@ -248,10 +344,7 @@ yarn.plant = (function(){
    
 
     context.restore(); 
-  };
-
-  /* static, the amount of units to advance per axis of direction. */
-  Player.prototype.SPEED = 5;
+  }; 
 
   /*
   * Player overrides game-object's update;
@@ -259,7 +352,7 @@ yarn.plant = (function(){
   */
   Player.prototype.update = function() {
     var player = this,
-      speed = Player.prototype.SPEED,
+      speed = this.SPEED,
       game = yarn; 
     
     var keys = game._keys,
@@ -299,6 +392,26 @@ yarn.plant = (function(){
     // TODO set the bot's sprite...
 
     return bot
+        .set_position( 0, 0 )
+        .set_velocity( 0, 0 )
+        .set_health( 1 );
+  }; 
+
+  /**
+  * @public
+  * Generate a Bacteria game object.
+  * @return Bacteria
+  */ 
+  ManufacturingPlant.prototype.make_bacteria = function() {
+    var plant = this;
+    var bug = $.extend( {}, 
+        new GameObject, 
+        new Bot,
+        new Bacteria ); 
+
+    // TODO set the bot's sprite...
+
+    return bug
         .set_position( 0, 0 )
         .set_velocity( 0, 0 )
         .set_health( 1 );

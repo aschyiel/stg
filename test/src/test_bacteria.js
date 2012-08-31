@@ -21,17 +21,59 @@
 * Bacteria do binary-fission, tumble-run movement, and "smell" their environments.
 */ 
 
+/*
+* calculate the distance of a given point from the center of the canvas.
+*/
+var get_distance_from_center = function( x, y ) {
+  var a = Math.abs( x - yarn.HALF_CANVAS_WIDTH ), 
+      b = Math.abs( y - yarn.HALF_CANVAS_HEIGHT ); 
+  return Math.sqrt( a*a + b*b );
+}
+
+/*
+* Calculate the angle (in radians) given a point from the center of the canvas.
+*/
+var get_angle_from_center = function( x, y ) {
+  var delta_x = x - yarn.HALF_CANVAS_WIDTH,
+      delta_y = y - yarn.HALF_CANVAS_HEIGHT;
+  return Math.atan2( delta_x, delta_y );
+}
+
+/*
+* round to 3 decimal places for testing purposes.
+*/
+var round = function( n ) {
+  return Math.round( n * 1000 )/1000; 
+}
+
 var main = function()
 { 
   console.debug( "test_bot start." );
   yarn.pause(); 
 
   test( "Bacteria use tumble-run for their motility, and they", function(){
-    expect(4);
-    equal( false, true, "should pick a random direction when they tumble." );
-    equal( false, true, "should move in a straight line when they run." );
-    equal( false, true, "should run less if they are going in the wrong direction." );
-    equal( false, true, "should run more if they are going in the right direction." ); 
+    expect(4); 
+    var bug = yarn.plant.make_bacteria();
+
+    bug.tumble();
+    var theta_0 = bug.theta;
+    bug.tumble(); 
+    equal( bug.theta !== theta_0, true, "should pick a random direction when they tumble." );
+
+    var reset_bug = function(){ bug.set_position( yarn.HALF_CANVAS_WIDTH, yarn.HALF_CANVAS_HEIGHT ); };
+    reset_bug(); bug.run(); 
+    equal( round( bug.theta ), round( get_angle_from_center( bug.x, bug.y ) ), 
+        "should move in a straight line when they run." );
+
+    var get_d = function(){ return get_distance_from_center( bug.x, bug.y ) };
+    reset_bug(); bug.run( bug.NEUTRAL_DIRECTION );
+    var normal_run_distance = get_d();
+
+    reset_bug(); bug.run( bug.WRONG_DIRECTION );
+    equal( normal_run_distance > get_d(), true, "should run less if they are going in the wrong direction." );
+
+    reset_bug(); bug.run( bug.CORRECT_DIRECTION );
+    equal( normal_run_distance < get_d(), true, "should run more if they are going in the right direction." ); 
   }); 
 
   test( "Bacteria can sense their immediate environment, and they", function(){

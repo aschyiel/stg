@@ -240,8 +240,10 @@ yarn.handle_mousemove = function( event ) {
   yarn.mouse_y = event.offsetY;
 };
 
-yarn.CANVAS_HEIGHT = 400;
-yarn.CANVAS_WIDTH =  600;
+yarn.CANVAS_HEIGHT =      400;
+yarn.CANVAS_WIDTH =       600;
+yarn.HALF_CANVAS_HEIGHT = 200;
+yarn.HALF_CANVAS_WIDTH =  300;
 
 /*
 * temporary...
