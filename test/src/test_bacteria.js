@@ -36,7 +36,8 @@ var get_distance_from_center = function( x, y ) {
 var get_angle_from_center = function( x, y ) {
   var delta_x = x - yarn.HALF_CANVAS_WIDTH,
       delta_y = y - yarn.HALF_CANVAS_HEIGHT;
-  return Math.atan2( delta_x, delta_y );
+  var rads = Math.atan2( delta_x, delta_y );
+  return rads;
 }
 
 /*
@@ -62,7 +63,13 @@ var main = function()
 
     var reset_bug = function(){ bug.set_position( yarn.HALF_CANVAS_WIDTH, yarn.HALF_CANVAS_HEIGHT ); };
     reset_bug(); bug.run(); 
-    equal( round( bug.theta ), round( get_angle_from_center( bug.x, bug.y ) ), 
+    //
+    // depending on your perspective, it either turned left or right,
+    // but the net-effect on the rotational angle is still the same.
+    //
+    equal( ( round( bug.theta ) == round( get_angle_from_center( bug.x, bug.y ) ) ||
+        ( round( 2 * Math.PI ) == round( Math.abs(bug.theta) + Math.abs(get_angle_from_center( bug.x, bug.y )) ) ) ), 
+        true,
         "should move in a straight line when they run." );
 
     var get_d = function(){ return get_distance_from_center( bug.x, bug.y ) };
