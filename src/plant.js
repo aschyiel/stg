@@ -207,6 +207,14 @@ yarn.plant = (function(){
 
   /* Indicate that the bug is currently reproducing and undergoing binary fission. */
   Bacteria.prototype.IS_REPRODUCING = 30; 
+
+  /*
+  * Levels of directional intent (to emulate chemotaxis).
+  * Affects basterial run distance.
+  */
+  Bacteria.prototype.CORRECT_DIRECTION = 41; 
+  Bacteria.prototype.WRONG_DIRECTION =   42; 
+  Bacteria.prototype.NEUTRAL_DIRECTION = 43; 
   
   Bacteria.prototype.HIT_WIDTH =       8;
   Bacteria.prototype.HIT_HEIGHT =      4;
@@ -246,6 +254,17 @@ yarn.plant = (function(){
         theta = this.theta,
         distance = this.SPEED; 
     bug.animation = bug.IS_RUNNING;
+    intent = intent || bug.NEUTRAL_DIRECTION;
+
+    //
+    // run distance is affected by chemotaxical level of intent.
+    // TODO dialize run distance modifiers?
+    //
+    if ( intent === bug.CORRECT_DIRECTION ) {
+      distance *= 1.5;
+    } else if ( intent === bug.WRONG_DIRECTION ) { 
+      distance *= 0.5;
+    }
 
     bug.x += ( distance * Math.sin( theta ) );
     bug.y += ( distance * Math.cos( theta ) );

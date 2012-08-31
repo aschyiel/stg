@@ -53,7 +53,7 @@ var main = function()
   yarn.pause(); 
 
   test( "Bacteria use tumble-run for their motility, and they", function(){
-    expect(4); 
+    expect(5); 
     var bug = yarn.plant.make_bacteria();
 
     bug.tumble();
@@ -72,9 +72,15 @@ var main = function()
         true,
         "should move in a straight line when they run." );
 
-    var get_d = function(){ return get_distance_from_center( bug.x, bug.y ) };
+    var get_d = function() { 
+          var d = get_distance_from_center( bug.x, bug.y );
+          console.debug( "distance:"+d );
+          return d;
+        };
     reset_bug(); bug.run( bug.NEUTRAL_DIRECTION );
-    var normal_run_distance = get_d();
+    var normal_run_distance = get_d(); 
+
+    equal( round(normal_run_distance), bug.SPEED, "should run a distance based on speed (ie. 5 units)." );
 
     reset_bug(); bug.run( bug.WRONG_DIRECTION );
     equal( normal_run_distance > get_d(), true, "should run less if they are going in the wrong direction." );
