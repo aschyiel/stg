@@ -117,11 +117,37 @@ var main = function()
   }); 
 
   test( "Bacteria reproduce via binary-fission, and they", function(){
-    expect(4);
-    equal( false, true, "should reproduce every 20 game-loop-cycles." );
-    equal( false, true, "should create a new bacteria from the exsiting bacteria." );
-    equal( false, true, "should not be \"tumbling\" while reproducing." );
-    equal( false, true, "should not be \"running\" while reproducing." );
+    expect(5);
+    var bug = yarn.plant.make_bacteria(); 
+    
+    equal( bug.is_reproducing(), false, "should not be reproducing when a bacteria is first instantiated." );
+
+    var i = 20;
+    while ( i-- ) { 
+      bug.update();
+    } 
+    equal( bug.is_reproducing(), true, "should reproduce after every 20 game-loop-cycles." );
+
+    var previous_count = yarn.graph._game_objects.length;
+    i = 6;
+    while ( i-- ) { 
+      bug.update();
+    } 
+    yarn.graph.update_world();  // note:Additions require calling update_world.
+    equal( !bug.is_reproducing() && yarn.graph._game_objects.length > previous_count, true, 
+        "should take 5 cycles to complete the process." );
+
+    equal( yarn.graph._game_objects.length > previous_count, true, 
+        "should create a new bacteria from the existing bacteria so that they \"double\" in number." );
+
+    var x = 0, 
+        y = 0;
+    bug.set_position( x, y );
+    bug.reproduce();
+    while ( bug.is_reproducing() ) {
+      bug.update();
+    }
+    equal( bug.x === x && bug.y === y, true, "should not be moving while they reproducing." );
   }); 
  
   test( "Bacteria are suspectible to anti-biotics, and they", function(){

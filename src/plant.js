@@ -35,6 +35,7 @@ yarn.plant = (function(){
 
     /* angle of rotation in radians (0 means "right" just like in the html5 canvas). */
     game_object.theta = 0;
+    game_object._frame = 0;
   }; 
   var Bot =                function(){}; 
   var Bacteria =           function(){}; 
@@ -252,14 +253,13 @@ yarn.plant = (function(){
 
   /*
   * chainable,
-  * animated,
   * Tell the bacteria to tumble and change their rotational-direction randomly.
   * To simplify testing, bacteria will never choose the same direction twice in a row.
   * @return Bacteria.
   */
   Bacteria.prototype.tumble = function() {
     var bug = this;
-    bug.animation = bug.IS_TUMBLING;
+    bug._state = bug.IS_TUMBLING;
     var theta = bug.theta;
     while ( theta == bug.theta ) {
       bug.theta = Math.random() * 2 * Math.PI;
@@ -269,7 +269,6 @@ yarn.plant = (function(){
 
   /*
   * chainable,
-  * animated,
   * Tell the bacteria to start running in the currently selected direction.
   * Based on how "correct" the current direction is, determines how far the bacteria will run.
   *
@@ -282,7 +281,7 @@ yarn.plant = (function(){
     var bug = this,
         theta = this.theta,
         distance = this.SPEED; 
-    bug.animation = bug.IS_RUNNING;
+    bug._state = bug.IS_RUNNING;
     intent = intent || bug.NEUTRAL_DIRECTION;
 
     //
@@ -336,6 +335,51 @@ yarn.plant = (function(){
     context.restore(); 
   }; 
 
+  /* How long bacteria take (in game-ticks) to reproduce. */
+  Bacteria.prototype.REPRODUCTION_TIME = 5;
+
+  /* How often (in game-ticks) bacteria decide to undergo reproduction. */
+  Bacteria.prototype.REPRODUCTION_FREQUENCY = 20;
+
+  /* The probability that a bacteria will go into a tunble while running. */
+  Bacteria.prototype.TUMBLE_PROBABILITY = 0.3;
+
+  /*
+  * Override GameObject.prototype.update
+  * @return void
+  */
+  Bacteria.prototype.update = function() {
+    var bug = this;
+    switch ( bug._state ) {
+      case bug.IS_TUMBLING:
+        bug.run();
+        break;
+      case bug.IS_RUNNING: 
+        if ( bug._frame > bug.REPRODUCTION_FREQUENCY - 2 ) {
+          bug._frame = 0;
+          bug.reproduce();
+          break;
+        }
+        if ( Math.random() < bug.TUMBLE_PROBABILITY ) {
+          bug.tumble();
+        } else {
+          bug.run();  //..continue running..
+        }
+        break;
+      case bug.IS_REPRODUCING:
+        if ( bug._frame > bug.REPRODUCTION_TIME ) {
+          bug._frame = 0;
+          bug.tumble();
+        } 
+          bug.reproduce( bug._frame );
+        break; 
+      default:
+        bug.tumble();
+        break;
+    }
+    bug._frame++;
+  };
+
   /** 
   * @public
   * Bacteria game-lot setter/getter, 
@@ -360,7 +404,30 @@ yarn.plant = (function(){
         lot = this.get_lot();
     lot.mark_dangerous();
     Bot.prototype.kill.call( bug ); 
-  }
+  };
+
+  /*
+  * returns true if the selected bacteria is currently undergoing binary-fission.
+  */
+  Bacteria.prototype.is_reproducing = function() {
+    var bug = this;
+    return bug._state === bug.IS_REPRODUCING;
+  };
+
+  /*
+  * tell the bacteria to undergo reproduction.
+  * This action takes n+ game ticks (as determined by REPRODUCTION_TIME).
+  */
+  Bacteria.prototype.reproduce = function( frame ) {
+    var bug = this;
+    bug._state = bug.IS_REPRODUCING;
+    if ( frame > bug.REPRODUCTION_TIME - 1 ) {
+      yarn.graph.push( 
+          yarn.plant.make_bacteria()
+          .set_position( bug.x, bug.y ) );  //..spawn offspring..
+      bug._state = bug.IS_RUNNING;
+    }
+  }; 
 
   //--------------------------------------------------
 
