@@ -206,6 +206,14 @@ yarn.graph = (function(){
   }; 
 
   /*
+  * returns the number of game objects currently occupying the graph.
+  */
+  GameGraph.prototype.length = function() {
+    var graph = this;
+    return graph._game_objects.length;
+  };
+
+  /*
   * @pseudo-private
   * Insert a game object into the world.
   * @param item - GameObject

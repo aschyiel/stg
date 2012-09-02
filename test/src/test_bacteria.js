@@ -152,7 +152,17 @@ var main = function()
  
   test( "Bacteria are suspectible to anti-biotics, and they", function(){
     expect(3);
+    //TODO play around with the idea of different kinds of anti-biotics -- growth inhibitors, etc...
+
+    yarn.graph._clear_game_graph();
+    var i = 10;
+    while ( i-- ) {
+      yarn.graph.push( yarn.plant.make_bacteria() );
+    }
+    yarn.graph.update_world();
+    var initial_bug_count = yarn.graph.length;
     equal( false, true, "should get mostly killed from exposure to \"new\" anti-biotics." );
+
     equal( false, true, "should not be completely killed off from anti-biotics." );
     equal( false, true, "should build up a resistance to \"old\" anti-biotics." );
   }); 
