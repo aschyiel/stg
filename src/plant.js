@@ -332,7 +332,6 @@ yarn.plant = (function(){
     context.save();
 
     context.setTransform( 1, 0, 0, 1, 0, 0 ); 
-    context.strokeStyle = '#0000FF';
     context.translate( 
             bug.x - bug.HALF_HIT_WIDTH, 
             bug.y - bug.HALF_HIT_HEIGHT ); 
@@ -343,7 +342,24 @@ yarn.plant = (function(){
             -bug.HALF_HIT_WIDTH, 
             -bug.HALF_HIT_HEIGHT ); 
 
-    var c = context;
+    context.drawImage( bug._cached_image, 0, 0 ); 
+
+    context.restore(); 
+  }; 
+
+  /*
+  * cached image of the bacteria.
+  * see http://www.html5rocks.com/en/tutorials/canvas/performance/
+  */
+  Bacteria.prototype._cached_image = (function(){
+    var bug_proto = Bacteria.prototype;
+    var canvas = document.createElement( 'canvas' );
+    canvas.width =  bug_proto.HIT_WIDTH;
+    canvas.height = bug_proto.HIT_HEIGHT;
+    
+    var c = canvas.getContext( '2d' );
+    c.strokeStyle = '#0000FF';
+
     c.beginPath();
     c.moveTo( 0, 0 ); c.lineTo( 8, 0 );
     c.moveTo( 8, 0 ); c.lineTo( 8, 4 );
@@ -354,8 +370,8 @@ yarn.plant = (function(){
     c.closePath();
     c.stroke(); 
 
-    context.restore(); 
-  }; 
+    return canvas;
+  })(); 
 
   /* How long bacteria take (in game-ticks) to reproduce. */
   Bacteria.prototype.REPRODUCTION_TIME = 5;
