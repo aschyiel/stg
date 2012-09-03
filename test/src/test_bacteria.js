@@ -181,15 +181,12 @@ var main = function()
   }); 
 
   test( "Bacteria are game objects that take damage, and they ", function(){
-    expect(2);
-    equal( false, true, "should be able to be killed." );
-    equal( false, true, "should die after 1 point of damage." );
-  }); 
+    expect( 2 );
+    var bug = yarn.plant.make_bacteria();
+    equal( bug.hp > 0, true, "should be not be labeled as \"killed\" when first instantiated." );
 
-  test( "Bacteria are game objects that deal damage to \"cell-walls\", and they ", function(){
-    expect(2);
-    equal( false, true, "should actually deal damage to cell-walls." );
-    equal( false, true, "should be able to destroy cell-walls." );
+    bug.kill();
+    equal( bug.hp, 0, "should be able to be killed." ); 
   }); 
 
   yarn.resume(); 
