@@ -47,8 +47,7 @@ var round = function( n ) {
   return Math.round( n * 1000 )/1000; 
 }
 
-var main = function()
-{ 
+var main = function() { 
   console.debug( "test_bot start." );
   yarn.pause(); 
 
@@ -189,16 +188,18 @@ var main = function()
     equal( bug.hp, 0, "should be able to be killed." ); 
   }); 
 
-  yarn.resume(); 
-} 
+  setTimeout( demo_bacteria_in_action, 1000 );
+}; 
 
-//
-// for testing purposes,
-// kill the usual game-loop,
-// and force us to simulate a loop by hand by manually calling yarn.tick();
-//
-var configure_yarn_for_testing = function() {
-  yarn.pause();
-}
+var demo_bacteria_in_action = function() {
+  yarn.graph._clear_game_graph(); 
+  yarn.tick();
+  var n = 16;
+  while ( n-- ) {
+    yarn.graph.push( yarn.plant.make_bacteria().randomize() ); 
+  }
+  yarn.tick();
+  yarn.resume(); 
+};
 
 $(document).on( yarn.EVENT_GAME_READY, main ); 

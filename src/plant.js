@@ -81,6 +81,24 @@ yarn.plant = (function(){
   }; 
 
   /*
+  * chainable,
+  * for testing purposes it is convenient to quickly randomize 
+  * the position/rotation/etc. of a given gameObject.
+  *
+  * To be called before adding to the game graph (simplifies lot assignment).
+  *
+  * @return GameObject.
+  */
+  GameObject.prototype.randomize = function() {
+    var game_object = this;
+    game_object.theta = ( 360 * Math.random() ) * ( Math.PI / 180 );
+    game_object.set_position( 
+        yarn.CANVAS_WIDTH * Math.random(), 
+        yarn.CANVAS_HEIGHT * Math.random() );
+    return game_object;
+  };
+
+  /*
   * returns true if the game object needs to be removed from the game.
   * ie. If a Bot gets killed, it will need to be marked for removal.
   * ie2. A projectile detonates, it will need to be removed as well.

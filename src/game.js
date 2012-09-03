@@ -211,10 +211,23 @@ yarn.handle_key = function( key_code, is_down ) {
     case 32:  /* spaceBar */ 
       keys[ key_code ] = is_down;
       break; 
+    case 13:  /* enter */
+      game._throttled_tick();
+      break;
     default:
       break;
   } 
 }
+
+/*
+* Advance the game world forward 
+* by one turn (for testing purposes).
+* throttled at 100 msec delay.  
+*/
+yarn._throttled_tick = (function() {
+  var game = yarn;
+  return _.throttle( yarn.tick, 100 );
+})();
 
 /*
 * returns true if any of the player control keys are pressed down.
