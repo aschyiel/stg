@@ -46,6 +46,28 @@ yarn.graph = (function(){
     * used to fill gaps in our model.
     */
     graph._vacancies = []; 
+
+    /*
+    * One-time callbacks to be triggered during update_world time 
+    * against each game_object currently in play.
+    */
+    graph._callbacks = [];
+
+    /*
+    * The GameGraph is considered to by "busy" while it is 
+    * performing it's update_world loop.
+    */
+    graph._is_busy = false;
+
+    /*
+    * The current GameObject count in the yarn game.
+    *
+    * This is a necessary evil because I'm using arrays incorrectly 
+    * (for now until I find an alternative data structure);
+    * due to javaScript array.length returning largested index + 1 
+    * which unfortunately includes null values.
+    */
+    graph._length = 0; 
   }; 
 
   //--------------------------------------------------
@@ -85,26 +107,71 @@ yarn.graph = (function(){
     context.fillRect( 0, 0, yarn.CANVAS_WIDTH, yarn.CANVAS_HEIGHT );
   };
 
+  /*
+  * queue up an update_world callback to be called during the next available "turn".
+  * The callback will be called once against every GameObject currently in play, 
+  * and then will be discarded.
+  *
+  * ie. Anti-biotics use this callback mechanism to weed out "Bacteria" GameObjects.
+  */
+  GameGraph.prototype.onetime_update_callback = function( callback ) {
+    var graph = this; 
+    if ( graph.is_busy() ) {
+      setTimeout( function(){ 
+          graph.onetime_update_callback( callback ); 
+        }, 
+        0 );  // TODO is 0 msec too aggressive here?
+              // or should I just straight up add callbacks upon callbacks all the way down?
+    } else {
+      graph._callbacks.push( callback );
+    }
+  };
+
+  /*
+  * returns true if the GameGraph is currently 
+  * in the middle of working through the "update_world" turn.
+  */
+  GameGraph.prototype.is_busy = function() {
+    var graph = this;
+    return graph._is_busy;
+  };
+
   /**
   * @public
-  * update the game object graph;
-  * animate stuff,
+  * Simulate a single game-turn ("tick") and update the entire game object graph;
   * apply position/velocity changes,
   * deal damage,
   * and add/remove bodies from the box2d world, etc.
   *
   * Tries to run in linear O(n) time.
   *
+  * Note: drawing/animation isn't handled here as that 
+  * should run (ideally) in a separate "thread".
+  *
   * @param dt - the time-step in msec representing the animation-frame elapsed time.
   * @return void
   */
   GameGraph.prototype.update_world = function( dt ) {
     var graph = this;
+    if ( graph._is_busy ) {
+      console.error( "Show Stopper, looks like update_world is either getting called too often or failed to complete it's last loop, or perhaps both..." );
+      return;
+    }
+    graph._is_busy = true; 
+
+    //
+    // Collect the callbacks locally,
+    // while simultaneously clearing them out for the "next" turn.
+    //
+    var callbacks = [];
+    while ( graph._callbacks.length ) {
+      callbacks.push( graph._callbacks.pop() ); 
+    } 
+
     var i = 0, 
       model = graph._game_objects,
       len = graph._game_objects.length,
-      game_object;
-
+      game_object; 
     for ( ; i < len; i++ ) {
       game_object = model[ i ]; 
 
@@ -112,6 +179,14 @@ yarn.graph = (function(){
       if ( null === game_object ) {
         continue;
       } 
+
+      //
+      // allow one-time callbacks to get a peice of the game-object action.
+      // ie. antibiotics.
+      //
+      $.each( callbacks, function( idx, callback ) { 
+        callback( game_object ); 
+      } );
 
       game_object.update(); 
 
@@ -148,8 +223,9 @@ yarn.graph = (function(){
       } else {
         graph._insert_game_object( game_object, null ); 
       }
-    }
+    } 
 
+    graph._is_busy = false; 
   }
 
   /*
@@ -168,6 +244,7 @@ yarn.graph = (function(){
       
     model[ index ] = null;
     graph._vacancies << index;
+    graph._length--;
   };
 
   /**
@@ -191,6 +268,7 @@ yarn.graph = (function(){
   * @return void
   */ 
   GameGraph.prototype.remove = function( item ) {
+    var graph = this;
     item.kill();
   };
 
@@ -203,14 +281,16 @@ yarn.graph = (function(){
     graph._game_objects = [];
     graph._push_queue = []; 
     graph._vacancies = []; 
+    graph._length = 0;
   }; 
 
   /*
   * returns the number of game objects currently occupying the graph.
+  * null/dead gameObjects are not included in the returned count.
   */
-  GameGraph.prototype.length = function() {
+  GameGraph.prototype.size = function() {
     var graph = this;
-    return graph._game_objects.length;
+    return graph._length;
   };
 
   /*
@@ -222,8 +302,8 @@ yarn.graph = (function(){
   */
   GameGraph.prototype._insert_game_object = function( item, index ) {
     var graph = this,
-      model = this._game_objects;
-
+      model = this._game_objects; 
+    graph._length++;
     if ( null !== index ) {
       model[ index ] = item; 
     } else {

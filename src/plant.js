@@ -38,7 +38,11 @@ yarn.plant = (function(){
     game_object._frame = 0;
   }; 
   var Bot =                function(){}; 
-  var Bacteria =           function(){}; 
+  var Bacteria =           function(){
+    var bug = this; 
+    bug.is_bacteria = true;
+    bug.resistance = 0; /* antibiotic resistance flags. */
+  }; 
   var Lot =                function() {
     var lot = this; 
     lot._neighbors = [];
@@ -391,7 +395,11 @@ yarn.plant = (function(){
   };
   Bacteria.prototype.get_lot = function() {
     var bug = this;
-    return bug._lot;
+    var lot = bug._lot;
+    if ( !lot ) {
+      console.warn( "TODO missing lot." );  // TODO this should be managed by the graph.
+    }
+    return lot;
   };
 
   /*
@@ -402,7 +410,7 @@ yarn.plant = (function(){
   Bacteria.prototype.kill = function() {
     var bug = this,
         lot = this.get_lot();
-    lot.mark_dangerous();
+    lot && lot.mark_dangerous();
     Bot.prototype.kill.call( bug ); 
   };
 

@@ -74,7 +74,6 @@ var main = function()
 
     var get_d = function() { 
           var d = get_distance_from_center( bug.x, bug.y );
-          console.debug( "distance:"+d );
           return d;
         };
     reset_bug(); bug.run( bug.NEUTRAL_DIRECTION );
@@ -122,22 +121,22 @@ var main = function()
     
     equal( bug.is_reproducing(), false, "should not be reproducing when a bacteria is first instantiated." );
 
-    var i = 20;
+    var i = 21;
     while ( i-- ) { 
       bug.update();
     } 
     equal( bug.is_reproducing(), true, "should reproduce after every 20 game-loop-cycles." );
 
-    var previous_count = yarn.graph._game_objects.length;
+    var previous_count = yarn.graph.size();
     i = 6;
     while ( i-- ) { 
       bug.update();
     } 
     yarn.graph.update_world();  // note:Additions require calling update_world.
-    equal( !bug.is_reproducing() && yarn.graph._game_objects.length > previous_count, true, 
+    equal( !bug.is_reproducing() && yarn.graph.size() > previous_count, true, 
         "should take 5 cycles to complete the process." );
 
-    equal( yarn.graph._game_objects.length > previous_count, true, 
+    equal( yarn.graph.size() > previous_count, true, 
         "should create a new bacteria from the existing bacteria so that they \"double\" in number." );
 
     var x = 0, 
@@ -150,9 +149,10 @@ var main = function()
     equal( bug.x === x && bug.y === y, true, "should not be moving while they reproducing." );
   }); 
  
-  test( "Bacteria are suspectible to anti-biotics, and they", function(){
-    expect(3);
-    //TODO play around with the idea of different kinds of anti-biotics -- growth inhibitors, etc...
+  test( "Bacteria are initially suspectible to anti-biotics, and they", function(){
+    expect( 4 );
+    // TODO play around with the idea of different kinds of anti-biotics -- growth inhibitors, etc...
+    // perhaps in a different unit test...
 
     yarn.graph._clear_game_graph();
     var i = 10;
@@ -160,11 +160,24 @@ var main = function()
       yarn.graph.push( yarn.plant.make_bacteria() );
     }
     yarn.graph.update_world();
-    var initial_bug_count = yarn.graph.length;
-    equal( false, true, "should get mostly killed from exposure to \"new\" anti-biotics." );
+    var initial_bug_count = yarn.graph.size();
+    yarn.meds.apply_penicillin(); 
+    yarn.graph.update_world();
+    equal( yarn.graph.size() < initial_bug_count, true, "should get mostly killed from exposure to \"new\" anti-biotics." );   // TODO this unit-test will failed around 10% of the time?
+    equal( yarn.graph.size() > 0, true, "should not be completely killed off from anti-biotics (should include at least 1 survivor)." );
 
-    equal( false, true, "should not be completely killed off from anti-biotics." );
-    equal( false, true, "should build up a resistance to \"old\" anti-biotics." );
+    var survivors_count = yarn.graph.size();
+    yarn.meds.apply_penicillin(); 
+    yarn.graph.update_world();
+    equal( yarn.graph.size() >= survivors_count, true, 
+        "should build up a resistance to \"old\" anti-biotics (rendering them ineffective on survivors)." );
+
+
+    var survivor = _.find( yarn.graph._game_objects, function( item ){ return item && item.is_bacteria; } );
+    window.survivor = survivor;
+    equal( survivor.resistance & yarn.meds.TYPE_PENICILLIN, true, 
+        "should record antibiotic resistance as a bit flag (in this scenario, resistance to penicillin)." );
+
   }); 
 
   test( "Bacteria are game objects that take damage, and they ", function(){
