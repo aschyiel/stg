@@ -188,6 +188,23 @@ var main = function() {
     equal( bug.hp, 0, "should be able to be killed." ); 
   }); 
 
+  test( "Players can squish Bacteria on collision", function(){
+    expect( 1 );
+
+    var bug = yarn.plant.make_bacteria();
+    var player = yarn.plan.make_player();
+    var x = 10, y = 10; // arbitrary coordinates to share.
+    bug.set_position( x, y ); player.set_position( x, y );
+    yarn.graph._clear_game_graph();
+    yarn.graph.push( bug );
+    yarn.graph.push( player );
+    yarn.graph.update_world();
+    equal( bug.hp, 0, "and this should result in the Bacteria getting killed." ); 
+  });
+
+  //
+  // finally, finish with a demo of bacteria in action.
+  //
   setTimeout( demo_bacteria_in_action, 1000 );
 }; 
 

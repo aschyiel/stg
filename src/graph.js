@@ -68,6 +68,13 @@ yarn.graph = (function(){
     * which unfortunately includes null values.
     */
     graph._length = 0; 
+
+    /*
+    * The game-board's 8x8 lot matrix represented as a flat array of 64 items.
+    * The top-left-corner lot-cell is represented by the first indice,
+    * and the bottom-right-corner being the last index of 63.
+    */
+    graph._lots = [];
   }; 
 
   //--------------------------------------------------
@@ -75,6 +82,28 @@ yarn.graph = (function(){
   // public
   // 
   //--------------------------------------------------
+
+  /**
+  * @public
+  * Find a lot in the grid that contains the given coordinates.
+  * @return (Lot)
+  */
+  GameGraph.prototype.find_lot = function( x, y ) {
+    var graph = this;
+    var w = graph.LOT_WIDTH,
+        h = graph.LOT_HEIGHT,
+        max_row = graph.NUMBER_OF_LOTS_HORIZONTALLY;
+
+    var rows_from_the_left = ~~( x / w ),  //..round down..
+        columns_down = ~~( y / h ); 
+
+    return graph._lots[ rows_from_the_left + columns_down * max_row ];
+  };
+
+  GameGraph.prototype.NUMBER_OF_LOTS_HORIZONTALLY = 8;
+  GameGraph.prototype.NUMBER_OF_LOTS_VERTICALLY =   8;
+  GameGraph.prototype.LOT_WIDTH =  yarn.CANVAS_WIDTH  / GameGraph.prototype.NUMBER_OF_LOTS_HORIZONTALLY;
+  GameGraph.prototype.LOT_HEIGHT = yarn.CANVAS_HEIGHT / GameGraph.prototype.NUMBER_OF_LOTS_VERTICALLY;
 
   /**
   * @public

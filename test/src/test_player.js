@@ -91,6 +91,9 @@ var setup_sandbox_player = function() {
   yarn.graph.push( player ); 
   window.player = player;
 
+  yarn.graph.push( yarn.plant.make_bacteria()
+      .set_position( yarn.HALF_CANVAS_WIDTH, yarn.HALF_CANVAS_HEIGHT ) );
+
   yarn.graph.update_world();
   yarn.graph.draw(); 
 }
