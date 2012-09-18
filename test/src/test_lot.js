@@ -27,7 +27,7 @@ var main = function()
   yarn.pause(); 
 
   test( "The game graph initializes the setup of the lot-matrix", function(){
-    expect(9);
+    expect( 7 );
 
     var width = yarn.CANVAS_WIDTH;
     var steps = 12; // The number of steps to test should be larger than 8 (width of canvas in "Lots").
@@ -57,14 +57,14 @@ var main = function()
 
     equal( yarn.graph._lots.length, 64, "should contain 64 lot-cells (just like a chess board)." );
 
-    equal( false, true, "should be as wide as the game field. " );
+    // TODO these are indirect tests and therefore bad...
+
     equal( 
         yarn.graph.NUMBER_OF_LOTS_HORIZONTALLY * yarn.graph.LOT_WIDTH, 
         yarn.CANVAS_WIDTH, 
         "should exactly fill the game width." );
 
 
-    equal( false, true, "should be as tall as the game field. " ); 
     equal( 
         yarn.graph.NUMBER_OF_LOTS_VERTICALLY * yarn.graph.LOT_HEIGHT, 
         yarn.CANVAS_HEIGHT, 
