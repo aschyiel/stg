@@ -85,6 +85,23 @@ yarn.graph = (function(){
 
   /**
   * @public
+  * Setup the game grid comprised of "Lots" representing spatial information our playing field.
+  * To be called inbetween levels.
+  * @return void
+  */
+  GameGraph.prototype.setup_grid = function() {
+    var graph = this,
+        plant = yarn.plant;
+    var lots = graph._lots,
+        iterations = graph.NUMBER_OF_LOTS_HORIZONTALLY * graph.NUMBER_OF_LOTS_VERTICALLY;
+
+    while ( iterations-- ) {
+      lots.push( plant.make_lot() );
+    } 
+  };
+
+  /**
+  * @public
   * Find a lot in the grid that contains the given coordinates.
   * @return (Lot)
   */
@@ -111,8 +128,7 @@ yarn.graph = (function(){
   * This does NOT change any of the game-objects positions/velocities/etc.
   */
   GameGraph.prototype.draw = function() {
-    var graph = this;
-    var i = 0,
+    var graph = this; var i = 0,
       model = graph._game_objects,
       len = graph._game_objects.length,
       game_object; 

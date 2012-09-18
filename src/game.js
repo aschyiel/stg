@@ -259,12 +259,15 @@ yarn.HALF_CANVAS_HEIGHT = 200;
 yarn.HALF_CANVAS_WIDTH =  300;
 
 /*
-* temporary...
+* To be called right before we kick off the game.
+* For Testing purposes, do additional game initializations/configurations here.
+* TODO This is where the "level-loading" logic might fit in.
 */
 yarn._setup_sandbox = function() {
   var game = this;
   game.graph.push( game.plant.make_bot().set_position( 20, 20 ).set_velocity( 5,  5 ) );
   game.graph.push( game.plant.make_bot().set_position( 40, 80 ).set_velocity( 2, -1 ) );
+  game.graph.setup_grid();
 };
 
 //--------------------------------------------------
