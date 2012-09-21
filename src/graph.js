@@ -98,6 +98,103 @@ yarn.graph = (function(){
     while ( iterations-- ) {
       lots.push( plant.make_lot() );
     } 
+
+    //
+    // Assign neighbors based on adjacent lots.
+    // ie. left, right, top-left, top, top-right, etc.
+    //
+
+    var n = graph.NUMBER_OF_LOTS_HORIZONTALLY,
+        idx =       lots.length - 1,
+        max_index = lots.length - 1,
+        lot; 
+  
+//  // returns true if the index represents the top left, 
+//  // top right, bottom left, or the bottom right corners.
+//  var is_corner = function( i ) {
+//    return 0 === i || 
+//        ( n - 1 ) === i || 
+//        ( ( n * m ) - 1 - n ) === i ||  
+//        ( ( n * m ) - 1 ) === i;
+//  };
+
+//  // Indices are considered an edge if they are along the top, left, right, and bottom.
+//  var is_edge = function( i ) {
+//    return !is_corner( i ) && 
+//      ( 
+//        is_along_top_edge( i )    ||
+//        is_along_bottom_edge( i ) ||
+//        is_along_left_edge( i )   ||
+//        is_along_right_edge( i ) 
+//      );
+//  };
+
+    var is_along_top_edge = function( i ) { 
+      return i > -1 && i < n; 
+    };
+
+    var is_along_bottom_edge = function( i ) { 
+      return ( i > ( ( n * m ) - n - 1 ) && ( i < ( ( n * m ) - 1 ) ) );
+    };
+
+    var is_along_left_edge = function( i ) {
+      return 0 === i % n; 
+    };
+
+    var is_along_right_edge = function( i ) { 
+      return ( n - 1 ) === i % n;
+    };
+
+
+    //
+    // TODO this doesn't handle just below the top right corner...
+    //
+
+    var get_adjacent_neighbor_indices = function( i ) {
+      var li = [];
+      
+      if ( !is_along_top_edge( i ) ) {
+        li.push( i - n );     // up
+        li.push( i - n - 1 ); // top left
+        li.push( i - n + 1 ); // top right
+      }
+
+      if ( !is_along_bottom_edge( i ) ) {
+        li.push( i + n );     // down
+        li.push( i + n - 1 ); // bottom left
+        li.push( i + n + 1 ); // bottom right
+      }
+
+      if ( !is_along_left_edge( i ) ) {
+        li.push( i - 1 );     // left
+      }
+
+      if ( !is_along_right_edge( i ) ) {
+        li.push( i + 1 );     // right
+      } 
+
+      return li;
+    };
+
+    //
+    // Massive TODO this doesn't properly reduce the number of neighbors along edges...
+    //
+  
+    while ( idx-- > -1 ) {
+      $.each( get_adjacent_neighbor_indices( idx ), 
+        function( count, elem_index ) {  
+          var lot = lots[ idx ];
+          if ( lot )
+          {
+            lot.grid_index = idx;
+            elem_index > -1 
+              && elem_index < max_index
+              && lots[ elem_index ] 
+              && lot._neighbors.push( lots[ elem_index ] ); 
+          }
+        } );
+    }
+
   };
 
   /**
