@@ -72,7 +72,20 @@ var main = function()
   }); 
 
   test( "Lots have neighbors", function(){
-    equal( false, true, "corners shuld have exactly 3 neighbors" );
+    //expect( 5 );
+
+    var lots = yarn.graph._lots,
+        graph = yarn.graph;
+
+    var top_left_corner =     graph.find_lot( 0, 0 ); 
+    equal( top_left_corner._neighbors.length, 3, "The top left corner shuld have exactly 3 neighbors" ); 
+    var top_right_corner =    graph.find_lot( yarn.CANVAS_WIDTH, 0 );
+    equal( top_right_corner._neighbors.length, 3, "The top right corner shuld have exactly 3 neighbors" ); 
+    var bottom_left_corner =  graph.find_lot( 0, yarn.CANVAS_HEIGHT );
+    equal( bottom_left_corner._neighbors.length, 3, "The bottom left corner shuld have exactly 3 neighbors" ); 
+    var bottom_right_corner = graph.find_lot( yarn.CANVAS_WIDTH, yarn.CANVAS_HEIGHT ); 
+    equal( bottom_right_corner._neighbors.length, 3, "The bottom right corner shuld have exactly 3 neighbors" );
+
     equal( false, true, "edges (excluding corners) shuld have exactly 5 neighbors" );
     equal( false, true, "\"middle\" lots should be surround by exactly 8 neighboring lots." );
     equal( false, true, "All lots should have at least 3 neighbors." );

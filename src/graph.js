@@ -105,36 +105,14 @@ yarn.graph = (function(){
     //
 
     var n = graph.NUMBER_OF_LOTS_HORIZONTALLY,
-        idx =       lots.length - 1,
-        max_index = lots.length - 1,
-        lot; 
-  
-//  // returns true if the index represents the top left, 
-//  // top right, bottom left, or the bottom right corners.
-//  var is_corner = function( i ) {
-//    return 0 === i || 
-//        ( n - 1 ) === i || 
-//        ( ( n * m ) - 1 - n ) === i ||  
-//        ( ( n * m ) - 1 ) === i;
-//  };
-
-//  // Indices are considered an edge if they are along the top, left, right, and bottom.
-//  var is_edge = function( i ) {
-//    return !is_corner( i ) && 
-//      ( 
-//        is_along_top_edge( i )    ||
-//        is_along_bottom_edge( i ) ||
-//        is_along_left_edge( i )   ||
-//        is_along_right_edge( i ) 
-//      );
-//  };
+        m = graph.NUMBER_OF_LOTS_VERTICALLY;
 
     var is_along_top_edge = function( i ) { 
       return i > -1 && i < n; 
     };
 
     var is_along_bottom_edge = function( i ) { 
-      return ( i > ( ( n * m ) - n - 1 ) && ( i < ( ( n * m ) - 1 ) ) );
+      return ( i > ( ( n * m ) - n - 1 ) && ( i < ( n * m ) ) );
     };
 
     var is_along_left_edge = function( i ) {
@@ -143,56 +121,135 @@ yarn.graph = (function(){
 
     var is_along_right_edge = function( i ) { 
       return ( n - 1 ) === i % n;
-    };
+    }; 
 
-
-    //
-    // TODO this doesn't handle just below the top right corner...
-    //
-
+    /*
+    * Returns the appropriate list of grid indices 
+    * representing neighboring lots for a given index.
+    */
     var get_adjacent_neighbor_indices = function( i ) {
-      var li = [];
-      
-      if ( !is_along_top_edge( i ) ) {
-        li.push( i - n );     // up
-        li.push( i - n - 1 ); // top left
-        li.push( i - n + 1 ); // top right
+      var is_along_top =    is_along_top_edge(    i ),
+          is_along_bottom = is_along_bottom_edge( i ), 
+          is_along_right =  is_along_right_edge(  i ),
+          is_along_left =   is_along_left_edge(   i ) ;
+    
+      //
+      // Handle "corner" cases with 3 neighbors (hee).
+      //
+
+      if ( is_along_top && is_along_left ) {
+        return [  
+          i + 1,    // right
+          i + n,    // down
+          i + n + 1 // down and right
+        ]; 
       }
 
-      if ( !is_along_bottom_edge( i ) ) {
-        li.push( i + n );     // down
-        li.push( i + n - 1 ); // bottom left
-        li.push( i + n + 1 ); // bottom right
+      if ( is_along_top && is_along_right ) {
+        return [  
+          i - 1,    // left
+          i + n,    // down
+          i + n - 1 // down and left
+        ]; 
       }
 
-      if ( !is_along_left_edge( i ) ) {
-        li.push( i - 1 );     // left
+      if ( is_along_bottom && is_along_left ) {
+        return [  
+          i + 1,    // right
+          i - n,    // up
+          i - n + 1 // up and right
+        ]; 
       }
 
-      if ( !is_along_right_edge( i ) ) {
-        li.push( i + 1 );     // right
+      if ( is_along_bottom && is_along_right ) {
+        return [  
+          i - 1,    // left
+          i - n,    // up
+          i - n - 1 // up and left
+        ]; 
+      }
+
+      //
+      // Handle "edge" cases with 5 neighbors (ha).
+      //
+
+      if ( is_along_top ) {
+        return [
+          i - 1,     // left
+          i + n - 1, // down and left
+          i + n,     // down
+          i + n + 1, // down and right
+          i + 1      // right
+        ];
+      }
+
+      if ( is_along_bottom ) {
+        return [
+          i - 1,     // left
+          i - n - 1, // up and left
+          i - n,     // up
+          i - n + 1, // up and right
+          i + 1      // right
+        ];
+      }
+
+      if ( is_along_left ) {
+        return [
+          i - n,      // up
+          i - n + 1,  // up and right
+          i + 1,      // right
+          i + n + 1,  // down and right
+          i + n       // down
+        ];
+      }
+
+      if ( is_along_right ) {
+        return [
+          i - n,      // up
+          i - n - 1,  // up and left
+          i - 1,      // left
+          i + n - 1,  // down and left
+          i + n       // down
+        ];
       } 
 
-      return li;
+      //
+      // Everyone else will have 8 neighbors all around.
+      //
+
+      return [  
+        i - 1,     // left
+        i + 1,     // right
+        i - n,     // up
+        i + n,     // down
+        i - n - 1, // up and left
+        i - n + 1, // up and right
+        i + n - 1, // down and left
+        i + n + 1  // down and right
+      ]; 
+
     };
 
     //
     // Massive TODO this doesn't properly reduce the number of neighbors along edges...
     //
-  
-    while ( idx-- > -1 ) {
+
+    var idx =       lots.length,
+        max_index = lots.length - 1;
+
+    while ( idx-- > 0 ) {
       $.each( get_adjacent_neighbor_indices( idx ), 
         function( count, elem_index ) {  
           var lot = lots[ idx ];
-          if ( lot )
-          {
+          if ( lot ) {
             lot.grid_index = idx;
             elem_index > -1 
-              && elem_index < max_index
+              && elem_index <= max_index
               && lots[ elem_index ] 
               && lot._neighbors.push( lots[ elem_index ] ); 
           }
-        } );
+        } 
+      );
     }
 
   };
@@ -208,10 +265,10 @@ yarn.graph = (function(){
         h = graph.LOT_HEIGHT,
         max_row = graph.NUMBER_OF_LOTS_HORIZONTALLY;
 
-    var rows_from_the_left = ~~( x / w ),  //..round down..
-        columns_down = ~~( y / h ); 
+    var rows_from_the_left = ~~( ~~( x - 0.5 ) / w ),  //..round down..
+        columns_down = ~~( ~~( y - 0.5 ) / h ); 
 
-    return graph._lots[ rows_from_the_left + columns_down * max_row ];
+    return graph._lots[ rows_from_the_left + ( columns_down * max_row ) ];
   };
 
   GameGraph.prototype.NUMBER_OF_LOTS_HORIZONTALLY = 8;
