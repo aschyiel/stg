@@ -78,15 +78,62 @@ var main = function()
         graph = yarn.graph;
 
     var top_left_corner =     graph.find_lot( 0, 0 ); 
-    equal( top_left_corner._neighbors.length, 3, "The top left corner shuld have exactly 3 neighbors" ); 
+    equal( top_left_corner._neighbors.length, 3, "The top left corner should have exactly 3 neighbors" ); 
     var top_right_corner =    graph.find_lot( yarn.CANVAS_WIDTH, 0 );
-    equal( top_right_corner._neighbors.length, 3, "The top right corner shuld have exactly 3 neighbors" ); 
+    equal( top_right_corner._neighbors.length, 3, "The top right corner should have exactly 3 neighbors" ); 
     var bottom_left_corner =  graph.find_lot( 0, yarn.CANVAS_HEIGHT );
-    equal( bottom_left_corner._neighbors.length, 3, "The bottom left corner shuld have exactly 3 neighbors" ); 
+    equal( bottom_left_corner._neighbors.length, 3, "The bottom left corner should have exactly 3 neighbors" ); 
     var bottom_right_corner = graph.find_lot( yarn.CANVAS_WIDTH, yarn.CANVAS_HEIGHT ); 
-    equal( bottom_right_corner._neighbors.length, 3, "The bottom right corner shuld have exactly 3 neighbors" );
+    equal( bottom_right_corner._neighbors.length, 3, "The bottom right corner should have exactly 3 neighbors" );
 
-    equal( false, true, "edges (excluding corners) shuld have exactly 5 neighbors" );
+    var x,
+        y,
+        lot,
+        b = true;
+    var reset_x_and_y = function() {
+      x = y = 0;
+    }
+    var next_x = function() {
+      x += 20; 
+      return x;
+    }; 
+    var next_y = function() {
+      y += 20; 
+      return y;
+    };
+    var check_edges_for_a_side = function( next_x, next_y ) { 
+      var lot = graph.find_lot( next_x(), next_y() );
+      var x, y;
+      while ( lot ) {
+        if ( lot !== top_left_corner
+            && lot !== top_right_corner
+            && lot !== bottom_left_corner
+            && lot !== bottom_right_corner ) {
+          if ( !b ) {
+            break;
+          }
+          b = lot._neighbors.length == 5; 
+        }
+        x = next_x(); y = next_y();
+        if ( x > yarn.CANVAS_WIDTH
+            || y > yarn.CANVAS_HEIGHT ) {
+          break;
+        }
+        lot = graph.find_lot( x, y );
+      } 
+    };
+
+    reset_x_and_y();
+    check_edges_for_a_side( next_x, function(){return 0} );                  // top   
+    reset_x_and_y();
+    check_edges_for_a_side( function(){return 0}, next_y );                  // left  
+    reset_x_and_y();
+    check_edges_for_a_side( function(){return yarn.CANVAS_WIDTH }, next_y );  // right  
+    reset_x_and_y();
+    check_edges_for_a_side( next_x, function(){ return yarn.CANVAS_HEIGHT } ); // bottom 
+    reset_x_and_y(); 
+    equal( b, true, "edges (excluding corners) should have exactly 5 neighbors" );
+
     equal( false, true, "\"middle\" lots should be surround by exactly 8 neighboring lots." );
     equal( false, true, "All lots should have at least 3 neighbors." );
     equal( false, true, "All lots should have at most 8 neighbors." ); 
