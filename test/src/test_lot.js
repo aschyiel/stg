@@ -124,19 +124,44 @@ var main = function()
     };
 
     reset_x_and_y();
-    check_edges_for_a_side( next_x, function(){return 0} );                  // top   
+    check_edges_for_a_side( next_x, function(){return 0} );                    // top   
     reset_x_and_y();
-    check_edges_for_a_side( function(){return 0}, next_y );                  // left  
+    check_edges_for_a_side( function(){return 0}, next_y );                    // left  
     reset_x_and_y();
-    check_edges_for_a_side( function(){return yarn.CANVAS_WIDTH }, next_y );  // right  
+    check_edges_for_a_side( function(){return yarn.CANVAS_WIDTH }, next_y );   // right  
     reset_x_and_y();
     check_edges_for_a_side( next_x, function(){ return yarn.CANVAS_HEIGHT } ); // bottom 
     reset_x_and_y(); 
     equal( b, true, "edges (excluding corners) should have exactly 5 neighbors" );
 
-    equal( false, true, "\"middle\" lots should be surround by exactly 8 neighboring lots." );
-    equal( false, true, "All lots should have at least 3 neighbors." );
-    equal( false, true, "All lots should have at most 8 neighbors." ); 
+    var w = graph.NUMBER_OF_LOTS_HORIZONTALLY;
+    var middle_lots = _.chain( graph._lots )
+        .select( function( it ) { return it.grid_index > w } )        // Exclude top edge. 
+        .select( function( it ) { return it.grid_index < ( graph.NUMBER_OF_LOTS_VERTICALLY 
+            * ( w - 1 ) ) } )                                  // Exclude bottom edge.
+        .select( function( it ) { return 0 !== it.grid_index % w } )  // Exclude left edge.
+        .select( function( it ) { return w - 1 !== it.grid_index % w } )  // Exclude right edge.
+        .value();
+    equal( false, 
+        _.chain( middle_lots )
+            .collect( function( it ) { return 8 == it._neighbors.length } ) 
+            .contains( false )
+            .value()
+        , "\"middle\" lots should be surround by exactly 8 neighboring lots." ); 
+
+    var is_not_all_atleast_3_neighbors = _.chain( graph._lots )
+        .collect( function( it ) { return it._neighbors.length >= 3; } )
+        .contains( false )
+        .value();
+    equal( false, is_not_all_atleast_3_neighbors, "All lots should have at least 3 neighbors." );
+
+    var is_not_all_under_8_neighbors = _.chain( _.collect( graph._lots, function( lot, idx ) {
+          return lot._neighbors.length < 9;    
+        } ) )
+        .contains( false ) 
+        .value();
+    equal( false, is_not_all_under_8_neighbors, "All lots should have at most 8 neighbors." ); 
+
   }); 
 
   test( "Surrounding \"cell-walls\" constitution is bound to their lots,", function(){
