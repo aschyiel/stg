@@ -496,7 +496,7 @@ yarn.plant = (function(){
   Lot.prototype.SIGNAL_FACTOR = 10;
 
   /* The maximum number of times a signal can be passed-on/re-told between neighbors. */
-  Lot.prototype.MAX_RETELLINGS = 4; 
+  Lot.prototype.MAX_RETELLINGS = 2; 
 
   /* 
   * The minimum chemical signal level to register a truth about a lot. 
