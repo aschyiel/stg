@@ -424,6 +424,13 @@ yarn.graph = (function(){
       }
     } 
 
+    //
+    // Update our lot-grids' spatial information.
+    //
+    _.each( graph._lots, function( it ) { 
+      it.update(); 
+    } );
+
     graph._is_busy = false; 
   }
 

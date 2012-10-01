@@ -275,8 +275,27 @@ var main = function()
 
   test( "Lot signals decay", function() { 
     reset_game_objects();
-    equal( false, true, "should be less signal after 1 turn." );
-    equal( false, true, "should eventually approach a signal strength of zero." ); 
+    var graph = yarn.graph, 
+        w = yarn.CANVAS_WIDTH,
+        h = yarn.CANVAS_HEIGHT;
+    var center_lot = graph.find_lot( w * 0.5, h * 0.5 );
+
+    center_lot.mark_dangerous();
+    var signal_initial = center_lot._danger_level;
+    yarn.tick(); 
+    var signal_after_1_turn = center_lot._danger_level; 
+    equal( true, 
+        signal_after_1_turn < signal_initial, 
+        "should be less signal after 1 turn." );
+
+    var turns = 100;
+    while ( turns-- ) {
+      yarn.tick();
+    }
+    var signal_after_many_turns_later = center_lot._danger_level; 
+    equal( true, 
+        ( signal_after_many_turns_later - 0.05 ) < 0, 
+        "should eventually approach a signal strength of zero." ); 
   } );
 
   setTimeout( run_demo, 1000 ); 

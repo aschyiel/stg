@@ -562,6 +562,22 @@ yarn.plant = (function(){
     } );
   }; 
 
+  /**
+  * Update the Lot's signal information, to be called 
+  * by the game-graph during it's update-world phase.
+  *
+  * Since Lots aren't GameObjects, it does not override GameObject.prototype.update.
+  *
+  * @return void.
+  */
+  Lot.prototype.update = function() {
+    var lot = this,
+        decay = this.SIGNAL_DECAY;
+    lot._danger_level *=     decay;
+    lot._population_level *= decay;
+    // TODO should resources decay as well?
+  };
+
   /*
   * returns true if the lot is flagged with too many danger signals.
   */
