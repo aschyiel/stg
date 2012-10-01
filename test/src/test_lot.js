@@ -310,14 +310,17 @@ var reset_game_objects = function() {
 };
 
 var run_demo = function() {
-  yarn.graph._clear_game_graph(); 
+  reset_game_objects();
   yarn.tick();
  
   var x = yarn.HALF_CANVAS_WIDTH,
       y = yarn.HALF_CANVAS_HEIGHT;
 
   yarn.graph.push( yarn.plant.make_player().set_position( x, y ) );
-  yarn.graph.push( yarn.plant.make_bacteria().set_position( x - 50, y ) ); 
+
+  var test_bug = yarn.plant.make_bacteria().set_position( x - 50, y ) 
+  yarn.graph.push( test_bug ); 
+  window.test_bug = test_bug;
 
   yarn.tick();
   yarn.resume();
