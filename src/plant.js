@@ -393,6 +393,7 @@ yarn.plant = (function(){
         bug.run();
         break;
       case bug.IS_RUNNING: 
+        bug.set_lot( yarn.graph.find_lot( bug.x, bug.y ) );
         if ( bug._frame > bug.REPRODUCTION_FREQUENCY - 2 ) {
           bug._frame = 0;
           bug.reproduce();
@@ -456,17 +457,32 @@ yarn.plant = (function(){
     return bug._state === bug.IS_REPRODUCING;
   };
 
+  /**
+  * Bacteria.set_position overrides GameObject.set_position.
+  * @copy GameObject#set_position( x, y ).
+  * @return GameObject
+  */
+  Bacteria.prototype.set_position = function( x, y ) {
+    var bug = this;
+    bug.set_lot( yarn.graph.find_lot( x, y ) ); 
+    GameObject.prototype.set_position( bug, x, y );
+    return bug;
+  };
+
   /*
   * tell the bacteria to undergo reproduction.
   * This action takes n+ game ticks (as determined by REPRODUCTION_TIME).
   */
   Bacteria.prototype.reproduce = function( frame ) {
-    var bug = this;
+    var bug = this,
+        lot;
     bug._state = bug.IS_REPRODUCING;
     if ( frame > bug.REPRODUCTION_TIME - 1 ) {
       yarn.graph.push( 
           yarn.plant.make_bacteria()
           .set_position( bug.x, bug.y ) );  //..spawn offspring..
+      lot = bug.get_lot();
+      lot && lot.mark_crowded();
       bug._state = bug.IS_RUNNING;
     }
   }; 
@@ -505,17 +521,6 @@ yarn.plant = (function(){
   Lot.prototype.mark_dangerous = function() {
     var lot = this;
     lot.mark_signal( "_danger_level" );
-  }
-
-  /*
-  * semi-recursive,
-  * Mark an area as bountiful and full of resources. 
-  * Passes the message along to surrounding neighbors as well.
-  * @return void
-  */ 
-  Lot.prototype.mark_bountiful = function() {
-    var lot = this;
-    lot.mark_signal( "_resource_level" );
   }
 
   /*

@@ -164,26 +164,28 @@ var main = function()
 
   }); 
 
-  test( "Surrounding \"cell-walls\" constitution is bound to their lots,", function(){
-    expect(1);
-    equal( false, true, "therefore when there is too many bacteria, they should \"die\"." );
-  }); 
-
-  test( "The \"Lot-grid\" provides a way detect GameObject collisions.", function(){
-  });
-
-  test( "GameObjects are assigned to lots during game play based on position", function(){
-    equal( false, true, "and should have a lot by default when added to the game graph." );
-    equal( false, true, "and should be reassigned to a different lot when they move accross the playing field." );
-    equal( false, true, "and multiple GameObjects should share the same lot if they are close enough." );
-  });
-
   test( "Lots provide a way to store temporal information about an area", function(){
-    expect( 3 );
+    expect( 2 );
+
     // TODO is_bountiful, etc.
-    equal( false, true, "Bacteria should be able to communicate about population density information." );
-    equal( false, true, "Bacteria should be able to communicate danger." );
-    equal( false, true, "Lots should provide information on the area's resources abundance." );
+    var graph = yarn.graph,
+        bug = yarn.plant.make_bacteria().set_position( 77, 77 ),
+        lot;
+    graph.push( bug ); yarn.tick(); yarn.tick();
+    lot = graph.find_lot( bug.x, bug.y );
+    var pop_lvl_1 = lot[ "_population_level" ] || 0;
+    bug.reproduce();
+    var i = bug.REPRODUCTION_TIME + 2;  //..plus add-to-graph time..
+    while ( i-- ) {
+      yarn.tick();
+    }
+    var pop_lvl_2 = lot[ "_population_level" ] || 0; 
+    equal( true, pop_lvl_2 > pop_lvl_1, "Bacteria should be able to communicate about population density information." );
+
+    var danger_lvl_1 = lot[ "_danger_level" ] || 0;
+    bug.kill(); yarn.tick(); yarn.tick(); 
+    var danger_lvl_2 = lot[ "_danger_level" ] || 0;
+    equal( true, danger_lvl_2 > danger_lvl_1, "Bacteria should be able to communicate danger." ); 
   }); 
 
   test( "Lots communicate with neighbors in a rippling \"signal\" effect", function(){

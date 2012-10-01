@@ -85,7 +85,8 @@ yarn.graph = (function(){
 
   /**
   * @public
-  * Setup the game grid comprised of "Lots" representing spatial information our playing field.
+  * Setup the game grid comprised of "Lots" representing spatial 
+  * information regarding our playing field.
   * To be called inbetween levels.
   * @return void
   */
@@ -340,12 +341,11 @@ yarn.graph = (function(){
   * Simulate a single game-turn ("tick") and update the entire game object graph;
   * apply position/velocity changes,
   * deal damage,
-  * and add/remove bodies from the box2d world, etc.
+  * and add/remove bodies from the game world, etc.
   *
   * Tries to run in linear O(n) time.
   *
-  * Note: drawing/animation isn't handled here as that 
-  * should run (ideally) in a separate "thread".
+  * Note: drawing/animation isn't handled here. 
   *
   * @param dt - the time-step in msec representing the animation-frame elapsed time.
   * @return void
@@ -380,7 +380,7 @@ yarn.graph = (function(){
       } 
 
       //
-      // allow one-time callbacks to get a peice of the game-object action.
+      // allow one-time callbacks to get a piece of the game-object action.
       // ie. antibiotics.
       //
       $.each( callbacks, function( idx, callback ) { 
