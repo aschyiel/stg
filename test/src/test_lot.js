@@ -167,10 +167,12 @@ var main = function()
   test( "Lots provide a way to store temporal information about an area", function(){
     expect( 2 );
 
+    reset_game_objects();
+
     // TODO is_bountiful, etc.
     var graph = yarn.graph,
         bug = yarn.plant.make_bacteria().set_position( 77, 77 ),
-        lot;
+        lot; 
     graph.push( bug ); yarn.tick(); yarn.tick();
     lot = graph.find_lot( bug.x, bug.y );
     var pop_lvl_1 = lot[ "_population_level" ] || 0;
@@ -188,18 +190,105 @@ var main = function()
     equal( true, danger_lvl_2 > danger_lvl_1, "Bacteria should be able to communicate danger." ); 
   }); 
 
-  test( "Lots communicate with neighbors in a rippling \"signal\" effect", function(){
-    equal( false, true, "Given a \"dangerous\" lot, it's neighbors should be aware of their indangerment." );
+  test( "Lots communicate with neighbors in a rippling \"signal\" effect", function(){ 
+    reset_game_objects(); 
+    var graph = yarn.graph, 
+        w = yarn.CANVAS_WIDTH,
+        h = yarn.CANVAS_HEIGHT;
+    var center_lot = graph.find_lot( w * 0.5, h * 0.5 );
 
+    //..closure to collect signal information..
+    var collect_signals = function( lots ) {
+        return _.chain( lots )
+        .collect( function( it ) {  
+          return {  
+            "_danger_level":     it._danger_level,
+            "_population_level": it._population_level
+          };
+        } )
+        .value(); 
+    };
+
+    //
+    // Before.
+    //
+
+    var adjacent_signals_initial = collect_signals( center_lot._neighbors ); 
+    var outer_neighbors = _.chain( center_lot._neighbors )
+        .collect( function( it ) {
+          return it._neighbors;
+        } )
+        .flatten( true )  //..flatten the nested lists by 1 level.. 
+        .select( function( it ) {
+          return !_.contains( center_lot._neighbors, it ) && !_.isEqual( center_lot, it ) ;
+        } )
+        .uniq()
+        .value(); // TODO this incorrectly collects 16 outer-neighbors instead of the expected (4+4+3+3=) 14.
+    var outer_neighbor_signals_initial = collect_signals( outer_neighbors ); 
+
+    //
+    // Send out "Lot" signals.
+    //
+
+    center_lot.mark_dangerous();
+    center_lot.mark_crowded(); 
+
+    //
+    // After.
+    //
+
+    var adjacent_signals_final = collect_signals( center_lot._neighbors );
+    var outer_neighbor_signals_final = collect_signals( outer_neighbors ); 
+
+    equal( true, 
+        center_lot[ "_danger_level" ] > adjacent_signals_final[ 0 ][ "_danger_level" ], 
+        "The signal center should be the strongest signal carrier." ); 
+
+    var total_signal_by_name = function( lots, signal_name ) {
+      return _.chain( lots )
+          .collect( function( it ) { 
+            return it[ signal_name ] || 0;
+          } )
+          .reduce( function( memo, it ) {
+            return memo + it;
+          } )
+          .value(); 
+    }; 
+
+    var danger_levels_initial = total_signal_by_name( adjacent_signals_initial, "_danger_level" );
+    var danger_levels_final  =  total_signal_by_name( adjacent_signals_final,   "_danger_level" ); 
+    equal( true, 
+        danger_levels_final > danger_levels_initial, 
+        "Given a \"dangerous\" lot, it's neighbors should be aware of their indangerment." );
+
+    var population_levels_initial = total_signal_by_name( adjacent_signals_initial, "_population_level" );
+    var population_levels_final  =  total_signal_by_name( adjacent_signals_final,   "_population_level" ); 
+    equal( true, 
+        population_levels_final > population_levels_initial, 
+        "Given a \"crowded\" area, it's surrounding neighbors should feel somewhat crowded too." ); 
+
+    var outer_danger_levels = total_signal_by_name( outer_neighbor_signals_final, "_danger_level" );
+    equal( true, 
+        outer_danger_levels < danger_levels_final, 
+        "Adjacent neighbors should receive \"stronger\" signals relative to outer/distance neighbors." ); 
   }); 
 
   test( "Lot signals decay", function() { 
+    reset_game_objects();
     equal( false, true, "should be less signal after 1 turn." );
     equal( false, true, "should eventually approach a signal strength of zero." ); 
   } );
 
   setTimeout( run_demo, 1000 ); 
 } 
+
+/* Reset our lot-grid spatial-signal information along with the game-graph. */
+var reset_game_objects = function() {
+  _.each( yarn.graph._lots, function( lot ) {
+      lot.clear_signals();
+  } ); 
+  yarn.graph._clear_game_graph();
+};
 
 var run_demo = function() {
   yarn.graph._clear_game_graph(); 

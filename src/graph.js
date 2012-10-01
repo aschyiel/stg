@@ -473,7 +473,7 @@ yarn.graph = (function(){
 
   /*
   * @private,
-  * for testing purposes, make it really easy to clear our model.
+  * for testing purposes, make it really easy to clear our model (except the lots grid).
   */
   GameGraph.prototype._clear_game_graph = function() {
     var graph = this;

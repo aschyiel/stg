@@ -464,7 +464,7 @@ yarn.plant = (function(){
   */
   Bacteria.prototype.set_position = function( x, y ) {
     var bug = this;
-    bug.set_lot( yarn.graph.find_lot( x, y ) ); 
+    bug.set_lot( yarn.graph.find_lot( x, y ) );
     GameObject.prototype.set_position( bug, x, y );
     return bug;
   };
