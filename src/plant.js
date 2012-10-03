@@ -48,6 +48,7 @@ yarn.plant = (function(){
     lot._neighbors = [];
   }; 
   var Player =             function(){}; 
+  var Projectile =         function(){}; 
 
   /* The default amount of movement-units to travel in a single tick. */
   GameObject.prototype.SPEED =  5;
@@ -687,6 +688,103 @@ yarn.plant = (function(){
 
   //-------------------------------------------------- 
 
+  /* The projectile weapon levels corresponding to its stats. */
+  Projectile.prototype.WEAPON_LEVEL_1 = 1;
+  Projectile.prototype.WEAPON_LEVEL_2 = 2;
+  Projectile.prototype.WEAPON_LEVEL_3 = 3;
+  Projectile.prototype.WEAPON_LEVEL_4 = 4;
+  Projectile.prototype.WEAPON_LEVEL_5 = 5;
+  Projectile.prototype.WEAPON_LEVEL_6 = 6;
+  Projectile.prototype.WEAPON_LEVEL_7 = 7;
+  Projectile.prototype.WEAPON_LEVEL_8 = 8;
+
+  /* The rendered color is based on the weapon's level. */ 
+  Projectile.prototype.COLOR_1 = '#cccccc'; /* grey         */
+  Projectile.prototype.COLOR_2 = '#ffffff'; /* white        */
+  Projectile.prototype.COLOR_3 = '#00ff00'; /* green        */
+  Projectile.prototype.COLOR_4 = '#0000ff'; /* blue         */
+  Projectile.prototype.COLOR_5 = '#ff00ff'; /* purple       */
+  Projectile.prototype.COLOR_6 = '#ffcc00'; /* orange       */
+  Projectile.prototype.COLOR_7 = '#ddffee'; /* pearlescent  */
+
+  /* 
+  * The base velocity used in calculating 
+  * the projectile's level based trajectory velocity. 
+  */ 
+  Projectile.prototype.BASE_VELOCITY = 1;
+
+  /*
+  * The velocity factor used in calculating projectile velocity.
+  */
+  Projectile.prototype.VELOCITY_FACTOR = 0.2;
+
+  /*
+  * Set the Projectile's weapon level, 
+  * affecting it's speed, damage, and other notable characteristics.
+  * @param lvl  The Weapon Level as an integer, defaults to Projectile.WEAPON_LEVEL_1.
+  * @return void
+  */
+  Projectile.prototype.set_weapon_level = function( lvl ) {
+    var bullet = this;
+    lvl = lvl || bullet.WEAPON_LEVEL_1;
+
+    bullet.velocity = bullet.BASE_VELOCITY + ( bullet.BASE_VELOCITY * bullet.VELOCITY_FACTOR * lvl );
+
+    var color = bullet.COLOR_1;
+    switch ( lvl ) {
+      case bullet.WEAPON_LEVEL_1:
+        break; 
+      case bullet.WEAPON_LEVEL_2:
+        color = bullet.COLOR_2;
+        break;
+      case bullet.WEAPON_LEVEL_3:
+        color = bullet.COLOR_3;
+        break;
+      default:
+        // TODO other weapon levels...
+        break;
+    }
+    bullet.color = color;
+  };
+
+  Projectile.prototype.HIT_HEIGHT = 8;
+  Projectile.prototype.HIT_WIDTH =  2;
+  Projectile.prototype.HALF_HIT_HEIGHT = Projectile.prototype.HIT_HEIGHT / 2;
+  Projectile.prototype.HALF_HIT_WIDTH =  Projectile.prototype.HIT_WIDTH  / 2;
+
+  /*
+  * Draw the projectile.
+  */
+  Projectile.prototype.draw = function() {
+    var bullet = this,
+      context = yarn.context; 
+    context.save();
+
+    context.setTransform( 1, 0, 0, 1, 0, 0 ); 
+    context.translate( 
+            bullet.x - bullet.HALF_HIT_WIDTH, 
+            bullet.y - bullet.HALF_HIT_HEIGHT ); 
+
+    var theta_offset = 1.57; // 90 degress offset in radians (due to html5 canvas).
+    context.rotate( bullet.theta + theta_offset ); 
+    context.translate( 
+            -bullet.HALF_HIT_WIDTH, 
+            -bullet.HALF_HIT_HEIGHT ); 
+    
+    var c = context;
+    c.strokeStyle = bullet.color;
+
+    c.beginPath();
+    c.moveTo( 0, 0 ); c.lineTo( 8, 0 );
+    c.moveTo( 0, 1 ); c.lineTo( 8, 1 );
+    c.closePath();
+    c.stroke(); 
+
+    context.restore(); 
+  };
+
+  //-------------------------------------------------- 
+
   /**
   * @public
   * Generate a bot game object.
@@ -757,6 +855,22 @@ yarn.plant = (function(){
     var lot = $.extend( {}, new Lot ); 
     lot.clear_signals();
     return lot;
+  };
+
+  /**
+  * @public
+  * Assemble a projectile to be shot in a direction.
+  * @param weapon_level   Optional, an integer representing the projectile's weapon level.
+  * @return A Projectile game object.
+  */
+  ManufacturingPlant.prototype.make_projectile = function( weapon_level ) {
+    var plant = this;
+    weapon_level = weapon_level || Projectile.WEAPON_LEVEL_1;
+    var projectile = $.extend( {}, 
+        new GameObject,
+        new Projectile );
+    projectile.set_weapon_level( weapon_level );
+    return projectile;
   };
 
   return new ManufacturingPlant();
