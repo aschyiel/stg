@@ -27,9 +27,10 @@
 */
 yarn.meds = (function(){
 
-  var MedicineCabinet = function() {
-    var meds = this;
-  };
+  // Local access to globals.
+  var yarn = yarn;
+
+  var MedicineCabinet = function() {};
 
   //
   // pseudo constants used to mark survivors of 
