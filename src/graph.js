@@ -21,6 +21,15 @@
 */
 yarn.graph = (function(){ 
 
+  // Local access to globals.
+  var yarn = yarn,
+      $ = $,
+      _ = _,
+      window = window,
+      document = document,
+      console = console,
+      setTimeout = setTimeout;
+
   //--------------------------------------------------
   //
   // private/inner classes
@@ -238,19 +247,21 @@ yarn.graph = (function(){
     var idx =       lots.length,
         max_index = lots.length - 1;
 
-    while ( idx-- > 0 ) {
-      $.each( get_adjacent_neighbor_indices( idx ), 
-        function( count, elem_index ) {  
+    var klosure = function( count, elem_index ) {  
           var lot = lots[ idx ];
           if ( lot ) {
             lot.grid_index = idx;
-            elem_index > -1 
-              && elem_index <= max_index
-              && lots[ elem_index ] 
-              && lot._neighbors.push( lots[ elem_index ] ); 
+            if ( elem_index > -1 && 
+              elem_index <= max_index && 
+              lots[ elem_index ] ) 
+                lot._neighbors.push( lots[ elem_index ] );
           }
-        } 
-      );
+        };
+
+    while ( idx-- > 0 ) {
+      $.each( 
+          get_adjacent_neighbor_indices( idx ), 
+          klosure( count, elem_index ) );
     }
 
   };
@@ -367,6 +378,10 @@ yarn.graph = (function(){
       callbacks.push( graph._callbacks.pop() ); 
     } 
 
+    var call_callback = function( idx, callback ) {
+          callback( game_object ); 
+        };
+
     var i = 0, 
       model = graph._game_objects,
       len = graph._game_objects.length,
@@ -383,9 +398,7 @@ yarn.graph = (function(){
       // allow one-time callbacks to get a piece of the game-object action.
       // ie. antibiotics.
       //
-      $.each( callbacks, function( idx, callback ) { 
-        callback( game_object ); 
-      } );
+      $.each( callbacks, call_callback( idx, callback ) );
 
       game_object.update(); 
 
@@ -432,7 +445,7 @@ yarn.graph = (function(){
     } );
 
     graph._is_busy = false; 
-  }
+  };
 
   /*
   * @pseudo-private
@@ -449,7 +462,7 @@ yarn.graph = (function(){
       model = this._game_objects;
       
     model[ index ] = null;
-    graph._vacancies << index;
+    graph._vacancies.push( index );
     graph._length--;
   };
 
@@ -474,7 +487,6 @@ yarn.graph = (function(){
   * @return void
   */ 
   GameGraph.prototype.remove = function( item ) {
-    var graph = this;
     item.kill();
   };
 
