@@ -21,6 +21,12 @@
 */
 yarn.plant = (function(){ 
 
+  // Local access to globals.
+  var yarn = yarn,
+      document = document,
+      console = console,
+      $ = $;  
+
   //--------------------------------------------------
   //
   // private/inner classes
@@ -106,7 +112,7 @@ yarn.plant = (function(){
   */
   GameObject.prototype.needs_removed = function() {
     var game_object = this;
-    return 0 == game_object.hp; // TODO out-of-bounds, may be "timers"? 
+    return 0 === game_object.hp; // TODO out-of-bounds, may be "timers"? 
   };
 
   /*
@@ -149,7 +155,7 @@ yarn.plant = (function(){
     var game_object = this;
     return game_object._is_position_dirty || 
         game_object._is_new               ||
-        0 == game_object.hp;
+        0 === game_object.hp;
   };
 
   /*
@@ -175,7 +181,7 @@ yarn.plant = (function(){
       vx =  game_object.vx,
       vy =  game_object.vy;
     game_object.set_position( x + vx, y + vy );
-  }
+  };
 
   /*
   * to be called by the game loop during an update,
@@ -446,7 +452,7 @@ yarn.plant = (function(){
   Bacteria.prototype.kill = function() {
     var bug = this,
         lot = this.get_lot();
-    lot && lot.mark_dangerous();
+    if ( lot ) lot.mark_dangerous();
     Bot.prototype.kill.call( bug ); 
   };
 
@@ -483,7 +489,7 @@ yarn.plant = (function(){
           yarn.plant.make_bacteria()
           .set_position( bug.x, bug.y ) );  //..spawn offspring..
       lot = bug.get_lot();
-      lot && lot.mark_crowded();
+      if ( lot ) lot.mark_crowded();
       bug._state = bug.IS_RUNNING;
     }
   }; 
@@ -512,7 +518,7 @@ yarn.plant = (function(){
     lot._danger_level =     0;
     lot._population_level = 0;
     lot._resource_level =   0;
-  } 
+  }; 
 
   /*
   * semi-recursive,
@@ -522,7 +528,7 @@ yarn.plant = (function(){
   Lot.prototype.mark_dangerous = function() {
     var lot = this;
     lot.mark_signal( "_danger_level" );
-  }
+  };
 
   /*
   * semi-recursive,
@@ -533,7 +539,7 @@ yarn.plant = (function(){
   Lot.prototype.mark_crowded = function() {
     var lot = this;
     lot.mark_signal( "_population_level" );
-  }
+  };
 
   /*
   * @private
@@ -585,17 +591,17 @@ yarn.plant = (function(){
   Lot.prototype.is_dangerous = function() {
     var lot = this;
     return lot._danger_level > lot.MINIMUM_SIGNAL;
-  }
+  };
 
   Lot.prototype.is_overcrowded = function() {
     var lot = this;
     return lot._population_level > lot.MINIMUM_SIGNAL;
-  }
+  };
 
   Lot.prototype.is_bountiful = function() {
     var lot = this;
     return lot._resource_level > lot.MINIMUM_SIGNAL;
-  } 
+  }; 
 
   // TODO allow setting neighboring lots in the graph?...
 
@@ -791,10 +797,9 @@ yarn.plant = (function(){
   * @return bot
   */
   ManufacturingPlant.prototype.make_bot = function() {
-    var plant = this;
     var bot = $.extend( {}, 
-        new GameObject, 
-        new Bot ); 
+        new GameObject(), 
+        new Bot() ); 
 
     // TODO set the bot's sprite...
 
@@ -810,11 +815,10 @@ yarn.plant = (function(){
   * @return Bacteria
   */ 
   ManufacturingPlant.prototype.make_bacteria = function() {
-    var plant = this;
     var bug = $.extend( {}, 
-        new GameObject, 
-        new Bot,
-        new Bacteria ); 
+        new GameObject(), 
+        new Bot(),
+        new Bacteria() ); 
 
     // TODO set the bot's sprite...
 
@@ -830,11 +834,10 @@ yarn.plant = (function(){
   * @return player
   */
   ManufacturingPlant.prototype.make_player = function() {
-    var plant = this;
     var player = $.extend( {}, 
-        new GameObject, 
-        new Bot,
-        new Player ); 
+        new GameObject(), 
+        new Bot(),
+        new Player() ); 
 
     // TODO set the bot's sprite...
 
@@ -851,8 +854,7 @@ yarn.plant = (function(){
   * @return Lot
   */
   ManufacturingPlant.prototype.make_lot = function() {
-    var plant = this;
-    var lot = $.extend( {}, new Lot ); 
+    var lot = $.extend( {}, new Lot() ); 
     lot.clear_signals();
     return lot;
   };
@@ -864,11 +866,10 @@ yarn.plant = (function(){
   * @return A Projectile game object.
   */
   ManufacturingPlant.prototype.make_projectile = function( weapon_level ) {
-    var plant = this;
     weapon_level = weapon_level || Projectile.WEAPON_LEVEL_1;
     var projectile = $.extend( {}, 
-        new GameObject,
-        new Projectile );
+        new GameObject(),
+        new Projectile() );
     projectile.set_weapon_level( weapon_level );
     return projectile;
   };
