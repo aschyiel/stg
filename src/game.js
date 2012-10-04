@@ -33,7 +33,15 @@
 *   http://james.padolsey.com/javascript/double-bitwise-not/
 *
 */
-yarn = (function(){
+
+// Local access to globals.
+var window = window,
+    document = document,
+    console = console,
+    $ = $,
+    _ = _;
+
+var yarn = (function(){
 
   //
   // private class,
@@ -60,6 +68,7 @@ yarn = (function(){
   }; 
   return new YarnGame();
 })();
+yarn = yarn;  // Export to global namespace.
 
 yarn.EVENT_GAME_READY = "YARN_EVENT_GAME_READY";
 
@@ -92,7 +101,7 @@ yarn.round = function( n ) {
 */
 yarn.is_paused = function() {
   return this.state == this.GAME_IS_PAUSED;
-}
+};
 
 /*
 * pause the game.
@@ -217,7 +226,7 @@ yarn.handle_key = function( key_code, is_down ) {
     default:
       break;
   } 
-}
+};
 
 /*
 * Advance the game world forward 
@@ -225,7 +234,6 @@ yarn.handle_key = function( key_code, is_down ) {
 * throttled at 100 msec delay.  
 */
 yarn._throttled_tick = (function() {
-  var game = yarn;
   return _.throttle( yarn.tick, 100 );
 })();
 
@@ -282,10 +290,10 @@ yarn._setup_sandbox = function() {
     console.debug( "setting up yarn, and kick-starting the game loop." );
     var $canvas = $( 'canvas.yarn' );
     var $doc = $(document);
-    $doc.keydown( function(e) { yarn.handle_keydown( e ) } );  // TODO only listen to 
-    $doc.keyup(   function(e) { yarn.handle_keyup(   e ) } );  // canvas's key events..
-    $doc.click(   function(e) { yarn.handle_click(   e ) } );  
-    $doc.mousemove( function(e) { yarn.handle_mousemove( e ) } );  
+    $doc.keydown( function(e) { yarn.handle_keydown( e ); } );  // TODO only listen to 
+    $doc.keyup(   function(e) { yarn.handle_keyup(   e ); } );  // canvas's key events..
+    $doc.click(   function(e) { yarn.handle_click(   e ); } );  
+    $doc.mousemove( function(e) { yarn.handle_mousemove( e ); } );  
     game.canvas = $canvas[0];
     game.canvas.height = yarn.CANVAS_HEIGHT;
     game.canvas.width =  yarn.CANVAS_WIDTH;
