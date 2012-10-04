@@ -13,6 +13,7 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
+/*global yarn:true, p1:true, p2:true */
 //-------------------------------------------------- 
 /*
 * graph.js, uly, aug2012
@@ -261,7 +262,7 @@ yarn.graph = (function(){
     while ( idx-- > 0 ) {
       $.each( 
           get_adjacent_neighbor_indices( idx ), 
-          klosure( count, elem_index ) );
+          klosure( p1, p2 ) );
     }
 
   };
@@ -367,7 +368,7 @@ yarn.graph = (function(){
       console.error( "Show Stopper, looks like update_world is either getting called too often or failed to complete it's last loop, or perhaps both..." );
       return;
     }
-    graph._is_busy = true; 
+    graph._is_busy = true;
 
     //
     // Collect the callbacks locally,
@@ -378,14 +379,13 @@ yarn.graph = (function(){
       callbacks.push( graph._callbacks.pop() ); 
     } 
 
-    var call_callback = function( idx, callback ) {
-          callback( game_object ); 
-        };
-
     var i = 0, 
       model = graph._game_objects,
       len = graph._game_objects.length,
-      game_object; 
+      game_object;
+    var call_callback = function( idx, callback ) {
+          callback( game_object ); 
+        };
     for ( ; i < len; i++ ) {
       game_object = model[ i ]; 
 
@@ -398,9 +398,9 @@ yarn.graph = (function(){
       // allow one-time callbacks to get a piece of the game-object action.
       // ie. antibiotics.
       //
-      $.each( callbacks, call_callback( idx, callback ) );
+      $.each( callbacks, call_callback( p1, p2 ) );
 
-      game_object.update(); 
+      game_object.update( dt ); 
 
       // skip items that don't need our attention. (x2)
       if ( !game_object.is_dirty() ) {
