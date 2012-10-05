@@ -130,6 +130,19 @@ yarn.plant = (function(){
 
   /*
   * chainable,
+  * set the rotation angle for the game object.
+  * @param angle in radians.
+  * @return GameObject
+  */
+  GameObject.prototype.set_theta = function( angle ) {
+    var game_object = this;
+    game_object.theta = angle;
+    return game_object;
+  };
+
+
+  /*
+  * chainable,
   * set the game object's velocity.
   * @param vx - velocity along the x axis in meters/sec.
   * @param vy - velocity along the y axis in meters/sec.
@@ -684,8 +697,34 @@ yarn.plant = (function(){
 
     player.x += dx;
     player.y += dy;
+
+    player._weapon_cooldown--;
+    player.is_weapon_loaded = player._weapon_cooldown < 0;
+    if ( keys[ 32 ] && player.is_weapon_loaded ) {
+      player.fire_weapon(); 
+    }
+
     GameObject.prototype.update.call( player ); 
-  }; 
+  };
+
+  /*
+  * The player's weapon cooldown in game ticks.
+  * TODO use timestamp deltas instead.
+  */
+  Player.prototype.WEAPON_COOLDOWN = 16;
+
+  /*
+  * Tell the player game object to fire a projectile 
+  * in it's current direction.
+  */
+  Player.prototype.fire_weapon = function() {
+    var player = this;
+    player._weapon_cooldown = Player.prototype.WEAPON_COOLDOWN;
+    yarn.graph.push( 
+        yarn.plant.make_projectile()
+            .set_position( player.x, player.y )
+            .set_theta( player.theta ) );
+  };
 
   //-------------------------------------------------- 
 
@@ -832,14 +871,17 @@ yarn.plant = (function(){
     var player = $.extend( {}, 
         new GameObject(), 
         new Bot(),
-        new Player() ); 
+        new Player() );
 
-    // TODO set the bot's sprite...
-
-    return player
+    player = player
         .set_position( 0, 0 )
         .set_velocity( 0, 0 )
         .set_health( 1 );
+
+    player._weapon_cooldown = 0;
+    player.is_weapon_loaded = true;
+
+    return player;
   }; 
 
   /**

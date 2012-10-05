@@ -25,25 +25,24 @@ var main = function()
   yarn.pause(); 
 
   test( 
-      "Projectiles ammunition is point based,",
-      function() { 
- 
-    expect( 3 );
-   
-    equal( false, true, "and their damage level is based on the number of points spent." );
-    equal( false, true, "and cannot be fired if player points are currently insufficient." );
-    equal( false, true, "and should decrease the player's scored points upon firing." );
-
-  } ); 
-
-  test( 
       "Projectiles are fired by the player,",
       function() { 
  
     expect( 3 );
-   
+
+    reset();
+
+    var SPACE_BAR_KEY = 32,
+        player = spawn_player();
+    var game_object_count = yarn.graph.size();
+    yarn.handle_keydown( { keyCode: SPACE_BAR_KEY } ); yarn.tick(); //yarn.tick();
+    yarn.handle_keyup( { keyCode: SPACE_BAR_KEY } );   yarn.tick(); yarn.tick();
+    equal( 
+        game_object_count, 
+        yarn.graph.size() + 1, 
+        "and they are shot using the space-bar key." );
+
     equal( false, true, "and they should spawn in-front of the player when fired." );
-    equal( false, true, "and they are shot using the space-bar key." );
     equal( false, true, "and their initial trajectory angle should be the same as the player." );
 
   } );
@@ -101,6 +100,20 @@ var main = function()
 
   } );
 
+  test( 
+      "Projectiles ammunition is point based,",
+      function() { 
+ 
+    expect( 3 );
+   
+    equal( false, true, "and their damage level is based on the number of points spent." );
+    equal( false, true, "and cannot be fired if player points are currently insufficient." );
+    equal( false, true, "and should decrease the player's scored points upon firing." );
+
+  } ); 
+
+  //----------------------------------------------------------
+
   setTimeout( run_demo, 1000 ); 
 } 
 
@@ -110,6 +123,13 @@ var reset = function() {
       lot.clear_signals();
   } ); 
   yarn.graph._clear_game_graph();
+};
+
+var spawn_player = function() {
+  var player = yarn.plant.make_player()
+      .set_position( yarn.HALF_CANVAS_WIDTH, yarn.HALF_CANVAS_HEIGHT );
+  yarn.graph.push( player ); yarn.tick();
+  return player;
 };
 
 /*
