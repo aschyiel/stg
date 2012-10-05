@@ -13,7 +13,7 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-/*global yarn:true */
+/*global yarn:true window:true document:true console:true $:true _:true */
 //-------------------------------------------------- 
 /*
 * game.js, uly, aug2012
@@ -34,14 +34,6 @@
 *   http://james.padolsey.com/javascript/double-bitwise-not/
 *
 */
-
-// Local access to globals.
-var window = window,
-    document = document,
-    console = console,
-    $ = $,
-    _ = _;
-
 var yarn = (function(){
 
   //

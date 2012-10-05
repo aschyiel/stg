@@ -13,7 +13,7 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-/*global yarn:true */
+/*global yarn:true  */
 //-------------------------------------------------- 
 /*
 * ..meds.js, uly, sept2012..
@@ -27,9 +27,6 @@
 * will eventually become resistant.
 */
 yarn.meds = (function(){
-
-  // Local access to globals.
-  var yarn = yarn;
 
   var MedicineCabinet = function() {};
 

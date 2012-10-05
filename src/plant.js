@@ -13,7 +13,7 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-/*global yarn:true */
+/*global yarn:true, document:true, console:true, $:true */
 //-------------------------------------------------- 
 /*
 * plant.js, uly, aug2012
@@ -21,12 +21,6 @@
 * yarn.plant is the manufacturing factory for generating game objects such as bots.
 */
 yarn.plant = (function(){ 
-
-  // Local access to globals.
-  var yarn = yarn,
-      document = document,
-      console = console,
-      $ = $;  
 
   //--------------------------------------------------
   //

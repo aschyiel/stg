@@ -1,0 +1,19 @@
+{
+	"folders":
+	[
+		{
+			"path": "/home/uli/code/uli.d/yarn",
+			"name": "yarn",
+			"file_exclude_patterns":
+			[
+				"*.sublime-project",
+				"*.sublime-workspace",
+				".gitignore",
+				"*~",
+				"*.swo",
+				"*.swp",
+				"*.bak"
+			]
+		}
+	]
+}

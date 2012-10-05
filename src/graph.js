@@ -13,23 +13,14 @@
 *  See the License for the specific language governing permissions and
 *  limitations under the License.
 */
-/*global yarn:true, p1:true, p2:true */
+/*global yarn:true, $:true, _:true, console:true, setTimeout:true */
 //-------------------------------------------------- 
 /*
 * graph.js, uly, aug2012
 *
 * The yarn.graph singleton manages the game graph and "world" concept away from game objects.
 */
-yarn.graph = (function(){ 
-
-  // Local access to globals.
-  var yarn = yarn,
-      $ = $,
-      _ = _,
-      window = window,
-      document = document,
-      console = console,
-      setTimeout = setTimeout;
+yarn.graph = (function(){
 
   //--------------------------------------------------
   //
@@ -260,9 +251,7 @@ yarn.graph = (function(){
         };
 
     while ( idx-- > 0 ) {
-      $.each( 
-          get_adjacent_neighbor_indices( idx ), 
-          klosure( p1, p2 ) );
+      $.each( get_adjacent_neighbor_indices( idx ), klosure );
     }
 
   };
@@ -398,7 +387,7 @@ yarn.graph = (function(){
       // allow one-time callbacks to get a piece of the game-object action.
       // ie. antibiotics.
       //
-      $.each( callbacks, call_callback( p1, p2 ) );
+      $.each( callbacks, call_callback );
 
       game_object.update( dt ); 
 
