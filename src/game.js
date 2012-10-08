@@ -257,19 +257,7 @@ yarn.handle_mousemove = function( event ) {
 yarn.CANVAS_HEIGHT =      400;
 yarn.CANVAS_WIDTH =       600;
 yarn.HALF_CANVAS_HEIGHT = 200;
-yarn.HALF_CANVAS_WIDTH =  300;
-
-/*
-* To be called right before we kick off the game.
-* For Testing purposes, do additional game initializations/configurations here.
-* TODO This is where the "level-loading" logic might fit in.
-*/
-yarn._setup_sandbox = function() {
-  var game = this;
-  game.graph.push( game.plant.make_bot().set_position( 20, 20 ).set_velocity( 5,  5 ) );
-  game.graph.push( game.plant.make_bot().set_position( 40, 80 ).set_velocity( 2, -1 ) );
-  game.graph.setup_grid();
-};
+yarn.HALF_CANVAS_WIDTH =  300; 
 
 //--------------------------------------------------
 
@@ -280,7 +268,7 @@ yarn._setup_sandbox = function() {
 (function() {
   var game = yarn;
   $(document).ready(function(){
-    console.debug( "setting up yarn, and kick-starting the game loop." );
+    console.debug( "Setting up yarn." );
     var $canvas = $( 'canvas.yarn' );
     var $doc = $(document);
     $doc.keydown( function(e) { yarn.handle_keydown( e ); } );  // TODO only listen to 
@@ -291,10 +279,10 @@ yarn._setup_sandbox = function() {
     game.canvas.height = yarn.CANVAS_HEIGHT;
     game.canvas.width =  yarn.CANVAS_WIDTH;
     game.context = game.canvas.getContext( "2d" );
-    console.debug( "canvas:"+game.canvas );
-    game.resume();
+    game.graph.setup_grid();
+    game.pause(); 
+    console.debug( 'Firing the "'+game.EVENT_GAME_READY+'" event.' );
     $(document).trigger( game.EVENT_GAME_READY ); // needed for testing.
-    yarn._setup_sandbox();
   });
 }());
 

@@ -25,6 +25,7 @@
 var main = function()
 { 
   yarn.pause(); 
+  start();  // Required by grunt qunit and PhantomJS.
 
   test( "The game graph initializes the setup of the lot-matrix", function(){
     expect( 7 );
@@ -72,7 +73,7 @@ var main = function()
   }); 
 
   test( "Lots have neighbors", function(){
-    //expect( 5 );
+    expect( 8 );
 
     var lots = yarn.graph._lots,
         graph = yarn.graph;
@@ -309,7 +310,8 @@ var reset_game_objects = function() {
   yarn.graph._clear_game_graph();
 };
 
-var run_demo = function() {
+var run_demo = function() { 
+  console.debug( "run_demo" );
   reset_game_objects();
   yarn.tick();
  
@@ -326,4 +328,11 @@ var run_demo = function() {
   yarn.resume();
 };
 
-$(document).on( yarn.EVENT_GAME_READY, main ); 
+//
+// Allow time for phantomJS to be injected by grunt.
+//
+
+$(document).on( yarn.EVENT_GAME_READY, function() { 
+  setTimeout( main, 0 ); 
+} ); 
+

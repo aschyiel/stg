@@ -219,4 +219,12 @@ var demo_bacteria_in_action = function() {
   yarn.resume(); 
 };
 
-$(document).on( yarn.EVENT_GAME_READY, main ); 
+//
+// Allow time for phantomJS to be injected by grunt.
+//
+
+$(document).on( yarn.EVENT_GAME_READY, function() { 
+  setTimeout( function(){ start(); main(); }, 0 ); 
+} ); 
+
+
