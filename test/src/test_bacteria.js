@@ -184,7 +184,7 @@ var main = function() {
   }); 
 
   test( "Players can squish Bacteria on collision", function(){
-    expect( 1 );
+    expect( 3 );
 
     var bug = yarn.plant.make_bacteria();
     var player = yarn.plant.make_player();
@@ -195,6 +195,18 @@ var main = function() {
     yarn.graph.push( player );
     yarn.graph.update_world();
     equal( bug.hp, 0, "and this should result in the Bacteria getting killed." ); 
+
+    // TODO hit detection tests don't belong here!
+
+    equal( yarn.plant.check_for_collision( bug, player ),
+        true,
+        "and they should collide when their positions overlap." );
+
+    bug.set_position( 100, 100 );
+    equal( yarn.plant.check_for_collision( bug, player ),
+        false,
+        "and they should not trigger a collision when they are far away from each other." );
+
   });
 
   //

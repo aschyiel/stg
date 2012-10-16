@@ -37,6 +37,7 @@ yarn.plant = (function(){
     /* angle of rotation in radians (0 means "right" just like in the html5 canvas). */
     game_object.theta = 0;
     game_object._frame = 0;
+    game_object.radius = 8;
   }; 
   var Bot =                function(){}; 
   var Bacteria =           function(){
@@ -58,6 +59,9 @@ yarn.plant = (function(){
   GameObject.prototype.HIT_HEIGHT = 32;
   GameObject.prototype.HALF_HIT_WIDTH =  GameObject.prototype.HIT_WIDTH / 2;
   GameObject.prototype.HALF_HIT_HEIGHT = GameObject.prototype.HIT_HEIGHT / 2;
+
+  /* The default collison radius used in hit detection. */
+  GameObject.prototype.DEFAULT_COLLISION_RADIUS = ( new GameObject ).radius;
 
   /*
   * Render the gameobject onto the canvas,
@@ -910,6 +914,28 @@ yarn.plant = (function(){
     projectile.set_weapon_level( weapon_level );
     return projectile;
   };
+
+  //-------------------------------------------------- 
+
+  /**
+  * @public
+  * Returns true if two game objects overlap in a bounding circle test.
+  * @param a (GameObject)
+  * @param b (GameObject)
+  * @return boolean
+  */
+  ManufacturingPlant.prototype.check_for_collision = function( a, b ) {
+
+    // see http://devmag.org.za/2009/04/13/basic-collision-detection-in-2d-part-1/
+    var ra = a.radius || GameObject.DEFAULT_COLLISION_RADIUS,
+        rb = b.radius || GameObject.DEFAULT_COLLISION_RADIUS,
+        dx = a.x - b.x,
+        dy = a.y - b.y;
+
+    return ( ( ra + rb ) * ( ra + rb ) ) >= ( ( dx * dx ) + ( dy * dy ) );  
+  };
+
+  //-------------------------------------------------- 
 
   return new ManufacturingPlant();
 })();
