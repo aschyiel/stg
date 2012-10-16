@@ -88,7 +88,7 @@ var main = function() {
   }); 
 
   test( "Bacteria can sense/communicate chemical signals within their immediate environment, and they", function(){
-    expect(4);
+    expect(3);
 
     var bug = yarn.plant.make_bacteria();
     var lot = yarn.plant.make_lot(); 
@@ -96,11 +96,6 @@ var main = function() {
  
     equal( bug.determine_intent( lot ), bug.WRONG_DIRECTION, 
         "should try to move away from danger." );
-
-    lot.clear_signals();
-    lot.mark_bountiful(); 
-    equal( bug.determine_intent( lot ), bug.CORRECT_DIRECTION, 
-        "should try to move towards resources." );
 
     lot.clear_signals();
     lot.mark_crowded(); 
@@ -192,7 +187,7 @@ var main = function() {
     expect( 1 );
 
     var bug = yarn.plant.make_bacteria();
-    var player = yarn.plan.make_player();
+    var player = yarn.plant.make_player();
     var x = 10, y = 10; // arbitrary coordinates to share.
     bug.set_position( x, y ); player.set_position( x, y );
     yarn.graph._clear_game_graph();
